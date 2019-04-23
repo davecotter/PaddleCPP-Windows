@@ -153,6 +153,11 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\PaddleWrapper\PaddleWrapper\PaddleWrapper.csproj">
+      <Project>{48d4ce69-00f7-4eac-95d6-0b20736261c0}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
