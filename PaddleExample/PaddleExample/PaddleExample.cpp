@@ -47,9 +47,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	auto paddle = PaddleCLR::PaddleCLR("***REMOVED***", "***REMOVED***", "***REMOVED***", "AcmeLooper", "Acme");
 
-	paddle.ShowCheckoutWindow("***REMOVED***");
+	auto* resultStr = paddle.ShowCheckoutWindow("***REMOVED***");
 
 	OutputDebugStringA("Checkout complete\n");
+	OutputDebugStringA(resultStr);
 
     // Main message loop:
     while (GetMessage(&msg, nullptr, 0, 0))

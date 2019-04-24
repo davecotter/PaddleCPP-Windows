@@ -33,7 +33,7 @@ class DllExport PaddleCLR
 public:
 	PaddleCLR(const char* vendorId, const char* productId, const char* apiKey, const char* productName, const char* vendorName);
 	~PaddleCLR();
-	void ShowCheckoutWindow(const char* productId);
+	const char* ShowCheckoutWindow(const char* productId);
 	
 private: 
 	PaddleWrapperPrivate* wrapper;

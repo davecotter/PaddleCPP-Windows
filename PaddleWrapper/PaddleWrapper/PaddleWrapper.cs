@@ -7,6 +7,8 @@ using System.Runtime.InteropServices;
 using PaddleSDK;
 using PaddleSDK.Checkout;
 using PaddleSDK.Product;
+using System.Threading;
+using System.Diagnostics;
 
 namespace PaddleWrapper
 {
@@ -18,6 +20,10 @@ namespace PaddleWrapper
         
         private string productName;
         private string vendorName;
+
+        private AutoResetEvent waitHandle;
+        private TransactionCompleteEventArgs transactionCompleteEventArgs;
+        private string errorString;
 
         public PaddleWrapper(string vendorId, string productId, string apiKey, string productName = "", string vendorName = "")
         {
@@ -42,6 +48,10 @@ namespace PaddleWrapper
 
             // Initialize the SDK singleton with the config
             Paddle.Configure(apiKey, vendorId, productId, productInfo);
+
+            Paddle.Instance.TransactionCompleteEvent += Paddle_TransactionCompleteEvent;
+            Paddle.Instance.TransactionErrorEvent += Paddle_TransactionErrorEvent;
+
         }
 
         public void Setup()
@@ -66,11 +76,13 @@ namespace PaddleWrapper
             ShowCheckoutWindow(productId);
         }
 
-        public void ShowCheckoutWindow(string specifiedProductId)
+        public String ShowCheckoutWindow(string specifiedProductId)
         { 
 
             // Initialize the Product you'd like to work with
             PaddleProduct product = PaddleProduct.CreateProduct(specifiedProductId);
+
+            errorString = "";
 
             // Ask the Product to get it's latest state and info from the Paddle Platform
             product.Refresh((success) =>
@@ -89,9 +101,34 @@ namespace PaddleWrapper
                     // The SDK was unable to get the last info from the Paddle Platform.
                     // We can show the Product Access dialog with the data provided in the PaddleProductConfig object.
                     Paddle.Instance.ShowProductAccessWindowForProduct(product);
-
                 }
             });
+
+            waitHandle = new AutoResetEvent(false);
+
+            // Wait for event completion
+            waitHandle.WaitOne();
+
+            if (errorString != "")
+                return errorString;
+
+            return transactionCompleteEventArgs.ToString();
+        }
+
+        private void Paddle_TransactionCompleteEvent(object sender, TransactionCompleteEventArgs e)
+        {
+            transactionCompleteEventArgs = e;
+            Debug.WriteLine("Paddle_TransactionCompleteEvent");
+            Debug.WriteLine(e.ToString());
+            waitHandle.Set(); 
+        }
+
+        private void Paddle_TransactionErrorEvent(object sender, TransactionErrorEventArgs e)
+        {
+            Debug.WriteLine("Paddle_TransactionErrorEvent");
+            Debug.WriteLine(e.ToString());
+            errorString = e.Error;
+            waitHandle.Set();
         }
 
         /**
@@ -101,7 +138,7 @@ namespace PaddleWrapper
         public event PageSumbittedEventHandler PageSubmitted;
         public event LicensingStartingEventHandler LicensingStarting;
         */
-        
+
         /*
         public void setTransactionCompleteEvent (IntPtr eventCallback)
         {
