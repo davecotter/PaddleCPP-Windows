@@ -1,8 +1,5 @@
 #pragma once
 
-using namespace System;
-using namespace System::Reflection;
-
 #define DllExport   __declspec(dllexport)
 
 
