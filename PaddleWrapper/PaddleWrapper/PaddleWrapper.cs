@@ -44,7 +44,7 @@ namespace PaddleWrapper
             Paddle.Configure(apiKey, vendorId, productId, productInfo);
         }
 
-        public void setup()
+        public void Setup()
         {
 
 
@@ -61,11 +61,16 @@ namespace PaddleWrapper
             
         }
 
-        void ShowCheckoutWindow(string _productId)
+        public void ShowCheckoutWindow()
+        {
+            ShowCheckoutWindow(productId);
+        }
+
+        public void ShowCheckoutWindow(string specifiedProductId)
         { 
 
             // Initialize the Product you'd like to work with
-            PaddleProduct product = PaddleProduct.CreateProduct(productId);
+            PaddleProduct product = PaddleProduct.CreateProduct(specifiedProductId);
 
             // Ask the Product to get it's latest state and info from the Paddle Platform
             product.Refresh((success) =>

@@ -11,10 +11,10 @@ class PaddleWrapperPrivate
 public: msclr::auto_gcroot<PaddleWrapper::PaddleWrapper^> paddleAPI;
 };
 
-PaddleCLR::PaddleCLR()
+PaddleCLR::PaddleCLR(const char* vendorId, const char* productId, const char* apiKey, const char* productName, const char* vendorName)
 {
 	wrapper = new PaddleWrapperPrivate();
-	wrapper->paddleAPI = gcnew PaddleWrapper::PaddleWrapper();
+	wrapper->paddleAPI = gcnew PaddleWrapper::PaddleWrapper(gcnew System::String(vendorId), gcnew System::String(productId), gcnew System::String(apiKey), gcnew System::String(productName), gcnew System::String(vendorName));
 }
 
 PaddleCLR::~PaddleCLR()
