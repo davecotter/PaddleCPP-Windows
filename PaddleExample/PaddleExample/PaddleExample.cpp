@@ -9,6 +9,16 @@
 
 #define MAX_LOADSTRING 100
 
+// Paddle config
+#define		PAD_VENDOR_ID					"11745"
+#define		PAD_VENDOR_NAME					"My Company"
+#define		PAD_VENDOR_AUTH					"***REMOVED***"
+#define		PAD_API_KEY						"4134242689d26430f89ec0858884ab07"
+#define     PAD_SERVER_PRODUCT				"***REMOVED***"
+#define		PAD_PRODUCT_NAME_Paddle_Server	"PaddleServer"
+
+////////////////
+
 // Global Variables:
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
@@ -44,13 +54,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_PADDLEEXAMPLE));
 
     MSG msg;
-
-	auto paddle = PaddleCLR::PaddleCLR("***REMOVED***", "***REMOVED***", "***REMOVED***", "AcmeLooper", "Acme");
-
-	auto* resultStr = paddle.ShowCheckoutWindow("***REMOVED***");
-
-	OutputDebugStringA("Checkout complete\n");
-	OutputDebugStringA(resultStr);
 
     // Main message loop:
     while (GetMessage(&msg, nullptr, 0, 0))
@@ -117,6 +120,13 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
+
+   auto paddle = PaddleCLR::PaddleCLR(PAD_VENDOR_ID, PAD_SERVER_PRODUCT, PAD_API_KEY, PAD_PRODUCT_NAME_Paddle_Server, PAD_VENDOR_NAME);
+
+   paddle.ShowCheckoutWindow(PAD_SERVER_PRODUCT);
+
+   OutputDebugStringA("Checkout complete\n");
+   OutputDebugStringA("\n");
 
    return TRUE;
 }

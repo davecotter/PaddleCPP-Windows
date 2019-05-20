@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Windows.Forms;
 
 using PaddleSDK;
 using PaddleSDK.Checkout;
 using PaddleSDK.Product;
+using PaddleSDK.Licensing;
 using System.Threading;
 using System.Diagnostics;
 
@@ -17,13 +20,22 @@ namespace PaddleWrapper
         private string vendorId;
         private string productId;
         private string apiKey;
-        
+
         private string productName;
         private string vendorName;
 
         private AutoResetEvent waitHandle;
         private TransactionCompleteEventArgs transactionCompleteEventArgs;
         private string errorString;
+
+        private Thread thread;
+        private SynchronizationContext ctx;
+        private ManualResetEvent mre;
+
+        public delegate void ShowCheckoutDelegate(PaddleProduct product);
+        ShowCheckoutDelegate dlg;
+
+        private PaddleProduct currentProduct;
 
         public PaddleWrapper(string vendorId, string productId, string apiKey, string productName = "", string vendorName = "")
         {
@@ -35,40 +47,17 @@ namespace PaddleWrapper
 
             PaddleProductConfig productInfo;
 
-            if (this.productName != "" && this.vendorName != "")
-            {
-                // Default Product Config in case we're unable to reach our servers on first run
-                productInfo = new PaddleProductConfig { ProductName = this.productName, VendorName = this.vendorName };
-            }
-            else
-            {
-                productInfo = new PaddleProductConfig { };
-            }
+            // Default Product Config in case we're unable to reach our servers on first run
+            productInfo = new PaddleProductConfig { ProductName = this.productName, VendorName = this.vendorName };
 
 
             // Initialize the SDK singleton with the config
             Paddle.Configure(apiKey, vendorId, productId, productInfo);
 
-            Paddle.Instance.TransactionCompleteEvent += Paddle_TransactionCompleteEvent;
-            Paddle.Instance.TransactionErrorEvent += Paddle_TransactionErrorEvent;
-
-        }
-
-        public void Setup()
-        {
-
-
-
-            // Set up events for Checkout.
-            // We recommend handling the TransactionComplete and TransactionError events.
-            // TransactionBegin is optional.
-            /* TODO
-            Paddle.Instance.TransactionCompleteEvent += Paddle_TransactionCompleteEvent;
-            Paddle.Instance.TransactionErrorEvent += Paddle_TransactionErrorEvent;
             Paddle.Instance.TransactionBeginEvent += Paddle_TransactionBeginEvent;
-            */
+            Paddle.Instance.TransactionCompleteEvent += Paddle_TransactionCompleteEvent;
+            Paddle.Instance.TransactionErrorEvent += Paddle_TransactionErrorEvent;
 
-            
         }
 
         public void ShowCheckoutWindow()
@@ -76,43 +65,122 @@ namespace PaddleWrapper
             ShowCheckoutWindow(productId);
         }
 
-        public String ShowCheckoutWindow(string specifiedProductId)
-        { 
+        public void ShowCheckoutWindow(string specifiedProductId)
+        {
 
             // Initialize the Product you'd like to work with
-            PaddleProduct product = PaddleProduct.CreateProduct(specifiedProductId);
-
-            errorString = "";
+            currentProduct = PaddleProduct.CreateProduct(specifiedProductId);
+            
 
             // Ask the Product to get it's latest state and info from the Paddle Platform
-            product.Refresh((success) =>
+            currentProduct.Refresh((success) =>
             {
                 // product data was successfully refreshed
                 if (success)
                 {
-                    if (!product.Activated)
+                    if (!currentProduct.Activated)
                     {
                         // Product is not activated, so let's show the Product Access dialog to gatekeep your app
-                        Paddle.Instance.ShowProductAccessWindowForProduct(product);
+                        //ShowCheckout(currentProduct);
+                        SetupCheckoutThread();
                     }
                 }
                 else
                 {
                     // The SDK was unable to get the last info from the Paddle Platform.
                     // We can show the Product Access dialog with the data provided in the PaddleProductConfig object.
-                    Paddle.Instance.ShowProductAccessWindowForProduct(product);
+                    //ShowCheckout(currentProduct);
+                    SetupCheckoutThread();
                 }
             });
 
-            waitHandle = new AutoResetEvent(false);
+            //waitHandle = new AutoResetEvent(false);
 
+            //// Wait for event completion
+            //waitHandle.WaitOne();
+
+            //if (errorString != "")
+            //    return errorString;
+
+        }
+
+        private void Initialize(object sender, EventArgs e)
+        {
+            ctx = SynchronizationContext.Current;
+            mre.Set();
+            Application.Idle -= Initialize;
+            if (ctx == null) throw new ObjectDisposedException("STAThread");
+            dlg = ShowCheckout;
+            ctx.Post((_) => dlg.Invoke(currentProduct), null);
+        }
+
+        private static void ShowCheckout(PaddleProduct product)
+        {
+            Paddle.Instance.ShowProductAccessWindowForProduct(product);
+        }
+
+        /**
+         * If the checkout window is invoked from a non-UI thread
+         */
+        private void SetupCheckoutThread()
+        {
+            using (mre = new ManualResetEvent(false))
+            {
+                thread = new Thread(() => {
+                    Application.Idle += Initialize;
+                    Application.Run();
+                });
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start();
+                mre.WaitOne();
+            }
+
+            //var thread = new Thread(() =>
+            //{
+            //    Paddle.Instance.ShowProductAccessWindowForProduct(product);
+            //    Application.Run();
+            //});
+            //thread.SetApartmentState(ApartmentState.STA);
+            //thread.Start();
+        }
+
+
+        public void Validate()
+        {
+            Paddle
+        }
+
+        public void Activate(string productId, string email, string license)
+        {
+
+            // Initialize the Product you'd like to work with
+            PaddleProduct product = PaddleProduct.CreateProduct(productId);
+            product.ActivateWithEmail(email, license, (VerificationState state, string s) =>
+            {
+                ActivateCompletion()
+                    
+            });
+        }
+
+        public string ActivateCompletion()
+        {
+
+            return "";
+        }
+
+         public void Purchase()
+        {
+
+        }
+
+        private void Paddle_TransactionBeginEvent(object sender, TransactionBeginEventArgs e)
+        {
+            waitHandle = new AutoResetEvent(false);
             // Wait for event completion
             waitHandle.WaitOne();
 
-            if (errorString != "")
-                return errorString;
-
-            return transactionCompleteEventArgs.ToString();
+            Debug.WriteLine("Paddle_TransactionBeginEvent");
+            Debug.WriteLine(e.ToString());
         }
 
         private void Paddle_TransactionCompleteEvent(object sender, TransactionCompleteEventArgs e)
@@ -120,7 +188,7 @@ namespace PaddleWrapper
             transactionCompleteEventArgs = e;
             Debug.WriteLine("Paddle_TransactionCompleteEvent");
             Debug.WriteLine(e.ToString());
-            waitHandle.Set(); 
+            waitHandle.Set();
         }
 
         private void Paddle_TransactionErrorEvent(object sender, TransactionErrorEventArgs e)

@@ -27,8 +27,14 @@ PaddleCLR::~PaddleCLR()
 	delete wrapper;
 }
 
-const char* PaddleCLR::ShowCheckoutWindow(const char* productId)
+void PaddleCLR::ShowCheckoutWindow(const char* productId)
 {
-	System::String^ managedString = wrapper->paddleAPI->ShowCheckoutWindow(gcnew System::String(productId));
-	return (const char*)Marshal::StringToHGlobalAnsi(managedString).ToPointer();
+	wrapper->paddleAPI->ShowCheckoutWindow(gcnew System::String(productId));
+	
 }
+
+//const char* PaddleCLR::ShowCheckoutWindow(const char* productId)
+//{
+//	System::String^ managedString = wrapper->paddleAPI->ShowCheckoutWindow(gcnew System::String(productId));
+//	return (const char*)Marshal::StringToHGlobalAnsi(managedString).ToPointer();
+//}

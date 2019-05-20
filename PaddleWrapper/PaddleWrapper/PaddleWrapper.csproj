@@ -72,6 +72,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
@@ -97,7 +98,7 @@
       <Version>11.0.1</Version>
     </PackageReference>
     <PackageReference Include="Paddle.PaddleSDK">
-      <Version>2.0.9</Version>
+      <Version>2.0.10</Version>
     </PackageReference>
     <PackageReference Include="UnmanagedExports">
       <Version>1.2.7</Version>
