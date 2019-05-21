@@ -26,16 +26,12 @@ namespace PaddleWrapper
 
         PaddleProduct currentProduct;
 
-        private AutoResetEvent waitHandle;
-        private TransactionCompleteEventArgs transactionCompleteEventArgs;
-        private string errorString;
-
         private Thread thread;
         private SynchronizationContext ctx;
         private ManualResetEvent mre;
 
         public delegate void ShowCheckoutDelegate(PaddleProduct product);
-        ShowCheckoutDelegate dlg;
+        ShowCheckoutDelegate showCheckoutDelegate;
 
         // delegates used for native C++ callback functions
         public delegate void CallbackDelegate();
@@ -114,7 +110,6 @@ namespace PaddleWrapper
 
         private static void ShowCheckout(PaddleProduct product)
         {
-            //Paddle.Instance.ShowProductAccessWindowForProduct(product);
             Paddle.Instance.ShowCheckoutWindowForProduct(product);
         }
 
@@ -127,8 +122,8 @@ namespace PaddleWrapper
             mre.Set();
             Application.Idle -= Initialize;
             if (ctx == null) throw new ObjectDisposedException("STAThread");
-            dlg = ShowCheckout;
-            ctx.Send((_) => dlg.Invoke(currentProduct), null);
+            showCheckoutDelegate = ShowCheckout;
+            ctx.Send((_) => showCheckoutDelegate.Invoke(currentProduct), null);
         }
 
         private void StartCheckoutThread()
@@ -180,7 +175,6 @@ namespace PaddleWrapper
         {
             transactionCompleteEventArgs = e;
 
-
             transactionCompleteCallback?.Invoke(
                 e.ProductID,
                 e.UserEmail,
@@ -200,21 +194,5 @@ namespace PaddleWrapper
             Debug.WriteLine("Paddle_TransactionErrorEvent");
             Debug.WriteLine(e.ToString());
         }
-
-        /**
-         * public event TransactionCompleteEventHandler TransactionCompleteEvent;
-        public event TransactionBeginEventHandler TransactionBeginEvent;
-        public event TransactionErrorEventHandler TransactionErrorEvent;
-        public event PageSumbittedEventHandler PageSubmitted;
-        public event LicensingStartingEventHandler LicensingStarting;
-        */
-
-        /*
-        public void setTransactionCompleteEvent (IntPtr eventCallback)
-        {
-            var eventDelegate = Marshal.GetDelegateForFunctionPointer(eventCallback, typeof(TransactionCompleteEventHandler));
-            //GetDelegateForFunctionPointer<TransactionCompleteEventHandler>(eventCallback);
-        }
-        */
     }
 }
