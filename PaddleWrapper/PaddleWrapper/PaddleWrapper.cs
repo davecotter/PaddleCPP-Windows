@@ -36,18 +36,19 @@ namespace PaddleWrapper
         // delegates used for native C++ callback functions
         public delegate void CallbackDelegate();
         public delegate void CallbackWithStringDelegate(string s);
-        public delegate void CallbackTransactionCompleteDelegate(
-            string ProductID, 
-            string UserEmail, 
-            string UserCountry, 
-            string LicenseCode,
-            string OrderID,
-            bool   Flagged,
-            string ProcessStatus);
+        public delegate void CallbackTransactionCompleteDelegate(string ProductID, 
+                                                                 string UserEmail, 
+                                                                 string UserCountry, 
+                                                                 string LicenseCode,
+                                                                 string OrderID,
+                                                                 bool   Flagged,
+                                                                 string ProcessStatus);
+        public delegate void CallbackActivateDelegate(int verificationState, string verificationString);
 
         public CallbackDelegate                     beginTransactionCallback;
         public CallbackTransactionCompleteDelegate  transactionCompleteCallback;
         public CallbackWithStringDelegate           transactionErrorCallback;
+        public CallbackActivateDelegate             activateCallback;
 
         public PaddleWrapper(string vendorId, string productId, string apiKey, string productName = "", string vendorName = "")
         {
@@ -69,9 +70,7 @@ namespace PaddleWrapper
             Paddle.Instance.TransactionBeginEvent    += Paddle_TransactionBeginEvent;
             Paddle.Instance.TransactionCompleteEvent += Paddle_TransactionCompleteEvent;
             Paddle.Instance.TransactionErrorEvent    += Paddle_TransactionErrorEvent;
-
         }
-
 
         public void ShowCheckoutWindow()
         {
@@ -114,6 +113,7 @@ namespace PaddleWrapper
         }
 
         //-------------------------------------------------------------------
+
         // Set up a suitable thread for the checkout window
         // Technique taken from https://stackoverflow.com/questions/21680738/how-to-post-messages-to-an-sta-thread-running-a-message-pump/21684059#21684059
         private void Initialize(object sender, EventArgs e)
@@ -140,20 +140,19 @@ namespace PaddleWrapper
             }
         }
 
+        //-------------------------------------------------------------------
+
         public void Validate()
         {
         }
 
         public void Activate(string productId, string email, string license)
         {
-
             // Initialize the Product you'd like to work with
             PaddleProduct product = PaddleProduct.CreateProduct(productId);
             product.ActivateWithEmail(email, license, (VerificationState state, string s) =>
             {
-                //ActivateCompletion()
-                // TODO Call marshalled delegate from function pointer
-                    
+                activateCallback(Convert.ToInt32(state), s);
             });
         }
 

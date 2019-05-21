@@ -168,12 +168,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
-   auto paddle = PaddleCLR::PaddleCLR(PAD_VENDOR_ID, PaddleProduct_Lite, PAD_API_KEY, PAD_PRODUCT_NAME_Lite, PAD_VENDOR_NAME);
+   auto paddle = PaddleCLR::PaddleCLR(PAD_VENDOR_ID, PAD_PRODUCT_Lite, PAD_API_KEY, PAD_PRODUCT_NAME_Lite, PAD_VENDOR_NAME);
 
    paddle.SetBeginTransactionCallback(beginTransactionCallback);
    paddle.SetTransactionCompleteCallback(transactionCompleteCallback);
    paddle.SetTransactionErrorCallback(transactionErrorCallback);
-   paddle.ShowCheckoutWindow(PaddleProduct_Lite);
+   paddle.ShowCheckoutWindow(PAD_PRODUCT_Lite);
 
    OutputDebugStringA("Checkout complete\n");
    OutputDebugStringA("\n");
