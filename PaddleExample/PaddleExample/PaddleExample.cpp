@@ -15,7 +15,17 @@
 #define		PAD_VENDOR_AUTH					"***REMOVED***"
 #define		PAD_API_KEY						"4134242689d26430f89ec0858884ab07"
 #define     PAD_SERVER_PRODUCT				"***REMOVED***"
+#define     PaddleProduct_Lite "511013"
+#define     PaddleProduct_Pro "***REMOVED***"
+#define     PaddleProduct_2  "***REMOVED***"
+
+//PaddleProduct_Burner = ***REMOVED***,
+//PaddleProduct_Producer = ***REMOVED***,
 #define		PAD_PRODUCT_NAME_Paddle_Server	"PaddleServer"
+#define		PAD_PRODUCT_NAME_Lite				"MyCoolApp Lite"
+#define		PAD_PRODUCT_NAME_Pro				"MyCoolApp Pro"
+#define		PAD_PRODUCT_NAME_2					"MyCoolApp 2"
+#define		PAD_PRODUCT_NAME_Burner				"MyCoolApp Burner"
 
 ////////////////
 
@@ -101,6 +111,46 @@ void __stdcall beginTransactionCallback()
 	OutputDebugStringA("beginTransactionCallback\n");
 }
 
+/*
+public string ProductID{ get; set; }
+public string UserEmail{ get; set; }
+public string UserCountry{ get; set; }
+public string LicenseCode{ get; set; }
+public string OrderID{ get; set; }
+public bool Flagged{ get; set; }
+public ProcessStatus ProcessStatus{ get; set; }
+*/
+void __stdcall transactionCompleteCallback(const char* productID, 
+										   const char* userEmail, 
+										   const char* userCountry, 
+	                                       const char* licenseCode, 
+	                                       const char* orderID, 
+	                                       bool flagged, 
+	                                       const char* processStatusJson)
+{
+	OutputDebugStringA("transactionCompleteCallback:\n");
+	OutputDebugStringA(productID);
+	OutputDebugStringA("\n");
+	OutputDebugStringA(userEmail);
+	OutputDebugStringA("\n");
+	OutputDebugStringA(userCountry);
+	OutputDebugStringA("\n");
+	OutputDebugStringA(licenseCode);
+	OutputDebugStringA("\n");
+	OutputDebugStringA(orderID);
+	OutputDebugStringA("\n");
+	OutputDebugStringA(flagged ? "flagged == true" : "flagged == false");
+	OutputDebugStringA("\n");
+	OutputDebugStringA(processStatusJson);
+}
+
+void __stdcall transactionErrorCallback(const char* error)
+{
+	OutputDebugStringA("transactionErrorCallback\n");
+	OutputDebugStringA(error);
+}
+
+
 //
 //   FUNCTION: InitInstance(HINSTANCE, int)
 //
@@ -126,10 +176,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
-   auto paddle = PaddleCLR::PaddleCLR(PAD_VENDOR_ID, PAD_SERVER_PRODUCT, PAD_API_KEY, PAD_PRODUCT_NAME_Paddle_Server, PAD_VENDOR_NAME);
+   auto paddle = PaddleCLR::PaddleCLR(PAD_VENDOR_ID, PaddleProduct_Lite, PAD_API_KEY, PAD_PRODUCT_NAME_Lite, PAD_VENDOR_NAME);
 
    paddle.SetBeginTransactionCallback(beginTransactionCallback);
-   paddle.ShowCheckoutWindow(PAD_SERVER_PRODUCT);
+   paddle.SetTransactionCompleteCallback(transactionCompleteCallback);
+   paddle.SetTransactionErrorCallback(transactionErrorCallback);
+   paddle.ShowCheckoutWindow(PaddleProduct_Lite);
 
    OutputDebugStringA("Checkout complete\n");
    OutputDebugStringA("\n");

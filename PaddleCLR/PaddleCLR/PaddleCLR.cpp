@@ -34,8 +34,29 @@ void PaddleCLR::ShowCheckoutWindow(const char* productId)
 
 void PaddleCLR::SetBeginTransactionCallback(CallbackType functionPtr)
 {
-	auto callback = (PaddleWrapper::PaddleWrapper::CallbackDelegate^) Marshal::GetDelegateForFunctionPointer(System::IntPtr(functionPtr), PaddleWrapper::PaddleWrapper::CallbackDelegate::typeid);
+	auto callback = (PaddleWrapper::PaddleWrapper::CallbackDelegate^) Marshal::GetDelegateForFunctionPointer(
+		System::IntPtr(functionPtr), 
+		PaddleWrapper::PaddleWrapper::CallbackDelegate::typeid);
+
 	wrapper->paddleAPI->beginTransactionCallback = callback;
+}
+
+void PaddleCLR::SetTransactionCompleteCallback(CallbackTransactionCompleteType functionPtr)
+{
+	auto callback = (PaddleWrapper::PaddleWrapper::CallbackTransactionCompleteDelegate^) Marshal::GetDelegateForFunctionPointer(
+		System::IntPtr(functionPtr), 
+		PaddleWrapper::PaddleWrapper::CallbackTransactionCompleteDelegate::typeid);
+
+	wrapper->paddleAPI->transactionCompleteCallback = callback;
+}
+
+void PaddleCLR::SetTransactionErrorCallback(CallbackWithStringType functionPtr)
+{
+	auto callback = (PaddleWrapper::PaddleWrapper::CallbackWithStringDelegate^) Marshal::GetDelegateForFunctionPointer(
+		System::IntPtr(functionPtr),
+		PaddleWrapper::PaddleWrapper::CallbackWithStringDelegate::typeid);
+
+	wrapper->paddleAPI->transactionErrorCallback = callback;
 }
 
 //const char* PaddleCLR::ShowCheckoutWindow(const char* productId)

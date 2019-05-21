@@ -40,18 +40,26 @@ namespace PaddleWrapper
         // delegates used for native C++ callback functions
         public delegate void CallbackDelegate();
         public delegate void CallbackWithStringDelegate(string s);
+        public delegate void CallbackTransactionCompleteDelegate(
+            string ProductID, 
+            string UserEmail, 
+            string UserCountry, 
+            string LicenseCode,
+            string OrderID,
+            bool   Flagged,
+            string ProcessStatus);
 
-        public CallbackDelegate beginTransactionCallback;
-        public CallbackDelegate transactionCompleteCallback;
-        public CallbackDelegate transactionErrorCallback;
+        public CallbackDelegate                     beginTransactionCallback;
+        public CallbackTransactionCompleteDelegate  transactionCompleteCallback;
+        public CallbackWithStringDelegate           transactionErrorCallback;
 
         public PaddleWrapper(string vendorId, string productId, string apiKey, string productName = "", string vendorName = "")
         {
-            this.vendorId = vendorId;
-            this.productId = productId;
-            this.apiKey = apiKey;
+            this.vendorId    = vendorId;
+            this.productId   = productId;
+            this.apiKey      = apiKey;
             this.productName = productName;
-            this.vendorName = vendorName;
+            this.vendorName  = vendorName;
 
             PaddleProductConfig productInfo;
 
@@ -62,9 +70,9 @@ namespace PaddleWrapper
             // Initialize the SDK singleton with the config
             Paddle.Configure(apiKey, vendorId, productId, productInfo);
 
-            Paddle.Instance.TransactionBeginEvent += Paddle_TransactionBeginEvent;
+            Paddle.Instance.TransactionBeginEvent    += Paddle_TransactionBeginEvent;
             Paddle.Instance.TransactionCompleteEvent += Paddle_TransactionCompleteEvent;
-            Paddle.Instance.TransactionErrorEvent += Paddle_TransactionErrorEvent;
+            Paddle.Instance.TransactionErrorEvent    += Paddle_TransactionErrorEvent;
 
         }
 
@@ -91,16 +99,14 @@ namespace PaddleWrapper
                     if (!product.Activated)
                     {
                         // Product is not activated, so let's show the Product Access dialog to gatekeep your app
-                        //ShowCheckout(currentProduct);
-                        SetupCheckoutThread();
+                        StartCheckoutThread();
                     }
                 }
                 else
                 {
                     // The SDK was unable to get the last info from the Paddle Platform.
                     // We can show the Product Access dialog with the data provided in the PaddleProductConfig object.
-                    //ShowCheckout(currentProduct);
-                    SetupCheckoutThread();
+                    StartCheckoutThread();
                 }
             });
 
@@ -108,9 +114,12 @@ namespace PaddleWrapper
 
         private static void ShowCheckout(PaddleProduct product)
         {
-            Paddle.Instance.ShowProductAccessWindowForProduct(product);
+            //Paddle.Instance.ShowProductAccessWindowForProduct(product);
+            Paddle.Instance.ShowCheckoutWindowForProduct(product);
         }
 
+        //-------------------------------------------------------------------
+        // Set up a suitable thread for the checkout window
         // Technique taken from https://stackoverflow.com/questions/21680738/how-to-post-messages-to-an-sta-thread-running-a-message-pump/21684059#21684059
         private void Initialize(object sender, EventArgs e)
         {
@@ -122,8 +131,7 @@ namespace PaddleWrapper
             ctx.Send((_) => dlg.Invoke(currentProduct), null);
         }
 
-        // If the checkout window is invoked from C++ we need to set up a thread for it
-        private void SetupCheckoutThread()
+        private void StartCheckoutThread()
         {
             using (mre = new ManualResetEvent(false))
             {
@@ -136,7 +144,6 @@ namespace PaddleWrapper
                 mre.WaitOne();
             }
         }
-
 
         public void Validate()
         {
@@ -172,15 +179,26 @@ namespace PaddleWrapper
         private void Paddle_TransactionCompleteEvent(object sender, TransactionCompleteEventArgs e)
         {
             transactionCompleteEventArgs = e;
+
+
+            transactionCompleteCallback?.Invoke(
+                e.ProductID,
+                e.UserEmail,
+                e.UserCountry,
+                e.LicenseCode,
+                e.OrderID,
+                e.Flagged,
+                e.ProcessStatus.ToString());
+
             Debug.WriteLine("Paddle_TransactionCompleteEvent");
             Debug.WriteLine(e.ToString());
         }
 
         private void Paddle_TransactionErrorEvent(object sender, TransactionErrorEventArgs e)
         {
+            transactionErrorCallback?.Invoke(e.Error);
             Debug.WriteLine("Paddle_TransactionErrorEvent");
             Debug.WriteLine(e.ToString());
-            errorString = e.Error;
         }
 
         /**
