@@ -58,9 +58,3 @@ void PaddleCLR::SetTransactionErrorCallback(CallbackWithStringType functionPtr)
 
 	wrapper->paddleAPI->transactionErrorCallback = callback;
 }
-
-//const char* PaddleCLR::ShowCheckoutWindow(const char* productId)
-//{
-//	System::String^ managedString = wrapper->paddleAPI->ShowCheckoutWindow(gcnew System::String(productId));
-//	return (const char*)Marshal::StringToHGlobalAnsi(managedString).ToPointer();
-//}
