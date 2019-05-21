@@ -30,7 +30,12 @@ PaddleCLR::~PaddleCLR()
 void PaddleCLR::ShowCheckoutWindow(const char* productId)
 {
 	wrapper->paddleAPI->ShowCheckoutWindow(gcnew System::String(productId));
-	
+}
+
+void PaddleCLR::SetBeginTransactionCallback(CallbackType functionPtr)
+{
+	auto callback = (PaddleWrapper::PaddleWrapper::CallbackDelegate^) Marshal::GetDelegateForFunctionPointer(System::IntPtr(functionPtr), PaddleWrapper::PaddleWrapper::CallbackDelegate::typeid);
+	wrapper->paddleAPI->beginTransactionCallback = callback;
 }
 
 //const char* PaddleCLR::ShowCheckoutWindow(const char* productId)

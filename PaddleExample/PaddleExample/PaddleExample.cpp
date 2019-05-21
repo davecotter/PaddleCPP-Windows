@@ -96,6 +96,11 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     return RegisterClassExW(&wcex);
 }
 
+void __stdcall beginTransactionCallback()
+{
+	OutputDebugStringA("beginTransactionCallback\n");
+}
+
 //
 //   FUNCTION: InitInstance(HINSTANCE, int)
 //
@@ -123,6 +128,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    auto paddle = PaddleCLR::PaddleCLR(PAD_VENDOR_ID, PAD_SERVER_PRODUCT, PAD_API_KEY, PAD_PRODUCT_NAME_Paddle_Server, PAD_VENDOR_NAME);
 
+   paddle.SetBeginTransactionCallback(beginTransactionCallback);
    paddle.ShowCheckoutWindow(PAD_SERVER_PRODUCT);
 
    OutputDebugStringA("Checkout complete\n");
@@ -130,6 +136,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    return TRUE;
 }
+
+
 
 //
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
@@ -152,7 +160,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             switch (wmId)
             {
             case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+				{
+					DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+
+
+				}
                 break;
             case IDM_EXIT:
                 DestroyWindow(hWnd);
