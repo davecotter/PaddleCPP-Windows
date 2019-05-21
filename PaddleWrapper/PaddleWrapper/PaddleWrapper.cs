@@ -173,8 +173,6 @@ namespace PaddleWrapper
 
         private void Paddle_TransactionCompleteEvent(object sender, TransactionCompleteEventArgs e)
         {
-            transactionCompleteEventArgs = e;
-
             transactionCompleteCallback?.Invoke(
                 e.ProductID,
                 e.UserEmail,
