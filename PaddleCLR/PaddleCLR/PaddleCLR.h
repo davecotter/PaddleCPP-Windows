@@ -2,30 +2,6 @@
 
 #define DllExport   __declspec(dllexport)
 
-
-//namespace PaddleCLR 
-//{
-//	ref class Wrapper
-//	{
-//	public:
-//		// TODO: Add your methods for this class here.
-//		Wrapper(const char* vendorId, const char* productId, const char* apiKey, const char* productName, const char* vendorName);
-//		void setup();
-//		void ShowCheckoutWindow(const char* productId);
-//
-//	private:
-//		PaddleWrapper::PaddleWrapper^ paddleWrapper;
-//	};
-//}
-
-/*
-DllExport void ShowMessageBox(int *value)
-{
-	ManagedDll::DoWork work;
-	work.ShowCSharpMessageBox(value);
-}
-*/
-
 typedef void(__stdcall *CallbackWithStringType)(const char*);
 typedef void(__stdcall *CallbackType)(void);
 typedef void(__stdcall *CallbackTransactionCompleteType)(const char*, const char*, const char*, const char*, const char*, bool, const char*);
