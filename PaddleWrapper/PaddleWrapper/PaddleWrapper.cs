@@ -10,7 +10,6 @@ using PaddleSDK;
 using PaddleSDK.Checkout;
 using PaddleSDK.Product;
 using PaddleSDK.Licensing;
-using System.Threading;
 using System.Diagnostics;
 
 namespace PaddleWrapper
