@@ -63,7 +63,7 @@ void __stdcall transactionErrorCallback(const char* error)
 Calling code:
 
 ```cpp
-  auto paddle = PaddleCLR::PaddleCLR(PAD_VENDOR_ID, PAD_PRODUCT, PAD_API_KEY, PAD_PRODUCT_NAME_Lite, PAD_VENDOR_NAME);
+  auto paddle = PaddleCLR::PaddleCLR(PAD_VENDOR_ID, PAD_PRODUCT, PAD_API_KEY, PAD_PRODUCT_NAME, PAD_VENDOR_NAME);
 
    paddle.SetBeginTransactionCallback(beginTransactionCallback);
    paddle.SetTransactionCompleteCallback(transactionCompleteCallback);
