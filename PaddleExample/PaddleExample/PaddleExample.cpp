@@ -10,23 +10,12 @@
 #define MAX_LOADSTRING 100
 
 // Paddle config
-#define		PAD_VENDOR_ID					"11745"
-#define		PAD_VENDOR_NAME					"My Company"
-#define		PAD_VENDOR_AUTH					"***REMOVED***"
-#define		PAD_API_KEY						"4134242689d26430f89ec0858884ab07"
-#define     PAD_PRODUCT_Paddle_Server		"***REMOVED***"
-#define     PAD_PRODUCT_Lite				"511013"
-#define     PAD_PRODUCT_Pro					"***REMOVED***"
-#define     PAD_PRODUCT_2					"***REMOVED***"
+#define	    PAD_VENDOR_ID               "11745"
+#define	    PAD_VENDOR_NAME             "My Company"
+#define	    PAD_API_KEY                 "4134242689d26430f89ec0858884ab07"
+#define     PAD_PRODUCT_ID              "511013"
 
-//PaddleProduct_Burner = ***REMOVED***,
-//PaddleProduct_Producer = ***REMOVED***,
-
-#define		PAD_PRODUCT_NAME_Paddle_Server		"PaddleServer"
-#define		PAD_PRODUCT_NAME_Lite				"MyCoolApp Lite"
-#define		PAD_PRODUCT_NAME_Pro				"MyCoolApp Pro"
-#define		PAD_PRODUCT_NAME_2					"MyCoolApp 2"
-#define		PAD_PRODUCT_NAME_Burner				"MyCoolApp Burner"
+#define	    PAD_PRODUCT_NAME            "MyCoolApp"
 
 ////////////////
 
@@ -168,12 +157,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
-   auto paddle = PaddleCLR::PaddleCLR(PAD_VENDOR_ID, PAD_PRODUCT_Lite, PAD_API_KEY, PAD_PRODUCT_NAME_Lite, PAD_VENDOR_NAME);
+   auto paddle = PaddleCLR::PaddleCLR(PAD_VENDOR_ID, PAD_PRODUCT_ID, PAD_API_KEY, PAD_PRODUCT_NAME, PAD_VENDOR_NAME);
 
    paddle.SetBeginTransactionCallback(beginTransactionCallback);
    paddle.SetTransactionCompleteCallback(transactionCompleteCallback);
    paddle.SetTransactionErrorCallback(transactionErrorCallback);
-   paddle.ShowCheckoutWindow(PAD_PRODUCT_Lite);
+   paddle.ShowCheckoutWindow(PAD_PRODUCT_ID);
 
    OutputDebugStringA("Checkout complete\n");
    OutputDebugStringA("\n");
