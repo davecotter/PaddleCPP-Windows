@@ -187,6 +187,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    paddle.SetBeginTransactionCallback(beginTransactionCallback);
    paddle.SetTransactionCompleteCallback(transactionCompleteCallback);
    paddle.SetTransactionErrorCallback(transactionErrorCallback);
+   paddle.SetProductActivateCallback(productActivateCallback);
    paddle.ShowCheckoutWindow(PAD_PRODUCT_ID);
 
    OutputDebugStringA("Checkout complete\n");

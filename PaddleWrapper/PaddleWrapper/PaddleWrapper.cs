@@ -74,6 +74,8 @@ namespace PaddleWrapper
             Paddle.Instance.TransactionBeginEvent    += Paddle_TransactionBeginEvent;
             Paddle.Instance.TransactionCompleteEvent += Paddle_TransactionCompleteEvent;
             Paddle.Instance.TransactionErrorEvent    += Paddle_TransactionErrorEvent;
+
+            Paddle.Instance.LicensingCompleteEvent   += Paddle_LicensingCompleteEvent;
         }
 
         public void ShowPaddleWindow(int windowType)
@@ -127,6 +129,8 @@ namespace PaddleWrapper
         {
             Paddle.Instance.ShowLicenseActivationWindowForProduct(product);
         }
+
+        private static void 
 
         //-------------------------------------------------------------------
 
@@ -224,6 +228,10 @@ namespace PaddleWrapper
             transactionErrorCallback?.Invoke(e.Error);
             Debug.WriteLine("Paddle_TransactionErrorEvent");
             Debug.WriteLine(e.ToString());
+        }
+
+        private void Paddle_LicensingCompleteEvent(object sender, LicensingCompleteEventArgs e)
+        {
         }
 
     }
