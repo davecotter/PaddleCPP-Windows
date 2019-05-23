@@ -137,7 +137,22 @@ namespace PaddleWrapper
             mre.Set();
             Application.Idle -= Initialize;
             if (ctx == null) throw new ObjectDisposedException("STAThread");
-            showProductWindowDelegate = ShowCheckoutWindow;
+            switch(currentWindowType)
+            {
+                case PaddleWindowType.Checkout:
+                    showProductWindowDelegate = ShowCheckoutWindow;
+                    break;
+                
+                case PaddleWindowType.LicenseActivation:
+                    showProductWindowDelegate = ShowLicenseActivationWindow;
+                    break;
+
+                default:
+                case PaddleWindowType.ProductAccess:
+                    showProductWindowDelegate = ShowProductAccessWindow;
+                    break;
+
+            }
             ctx.Send((_) => showProductWindowDelegate.Invoke(currentProduct), null);
         }
 
