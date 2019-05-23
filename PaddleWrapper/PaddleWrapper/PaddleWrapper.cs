@@ -130,8 +130,6 @@ namespace PaddleWrapper
             Paddle.Instance.ShowLicenseActivationWindowForProduct(product);
         }
 
-        private static void 
-
         //-------------------------------------------------------------------
 
         // Set up a suitable thread for the checkout window
@@ -194,7 +192,7 @@ namespace PaddleWrapper
 
         public void Purchase()
         {
-
+            // TODO (?)
         }
 
         private void Paddle_TransactionBeginEvent(object sender, TransactionBeginEventArgs e)
@@ -232,6 +230,7 @@ namespace PaddleWrapper
 
         private void Paddle_LicensingCompleteEvent(object sender, LicensingCompleteEventArgs e)
         {
+               // TODO
         }
 
     }
