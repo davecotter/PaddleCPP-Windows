@@ -17,7 +17,13 @@ Add `PaddleCLR.lib` to "Additional dependencies" (Linker/Input section)
 
 #### Building from scratch
 
-TBC
+Open the PaddleCLR solution in Visual Studio
+
+Build
+
+[This step to be automated]
+
+Copy all DLLs in the `PaddleCLR\Debug` folder to the example project's `Debug` folder. 
 
 ### Example code
 
