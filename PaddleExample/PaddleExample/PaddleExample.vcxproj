@@ -96,9 +96,12 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\PaddleCLR\Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\PaddleCLR\Debug;..\..\PaddleExample\Debug</AdditionalLibraryDirectories>
       <AdditionalDependencies>PaddleCLR.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <ProjectReference>
+      <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -171,6 +174,14 @@
   <ItemGroup>
     <Image Include="PaddleExample.ico" />
     <Image Include="small.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\PaddleCLR\PaddleCLR\PaddleCLR.vcxproj">
+      <Project>{49fb9bed-cf7f-4ad6-a005-5cdb2a5c9a68}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\PaddleWrapper\PaddleWrapper\PaddleWrapper.csproj">
+      <Project>{48d4ce69-00f7-4eac-95d6-0b20736261c0}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
