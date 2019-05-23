@@ -9,15 +9,26 @@
 
 #define MAX_LOADSTRING 100
 
-// Paddle config
-#define	    PAD_VENDOR_ID               "11745"
-#define	    PAD_VENDOR_NAME             "My Company"
-#define	    PAD_API_KEY                 "4134242689d26430f89ec0858884ab07"
-#define     PAD_PRODUCT_ID              "511013"
 
-#define	    PAD_PRODUCT_NAME            "MyCoolApp"
+#if __has_include("PaddleCredentials.h")        // Requires VS2015 Update 2 and above
+ #include	"PaddleCredentials.h"
+#else
+/**
+ * Default Paddle credentials
+ *
+ * Copy and paste into "PaddleCredentials.h" and add your own details 
+ * to use your Paddle account
+ */
+ #define	PAD_VENDOR_ID               "11745"
+ #define    PAD_VENDOR_NAME             "My Company"
+ #define    PAD_API_KEY                 "4134242689d26430f89ec0858884ab07"
+ #define    PAD_PRODUCT_ID              "511013"
+ #define    PAD_PRODUCT_NAME            "MyCoolApp"
+#endif
 
-////////////////
+//---------------------------------------------------------------------------
+
+
 
 // Global Variables:
 HINSTANCE hInst;                                // current instance
@@ -96,6 +107,10 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     return RegisterClassExW(&wcex);
 }
 
+//---------------------------------------------------------------------------
+
+// Paddle callbacks
+
 void __stdcall beginTransactionCallback()
 {
 	OutputDebugStringA("beginTransactionCallback\n");
@@ -157,6 +172,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
+   // Relevant example code starts here: 
+
    auto paddle = PaddleCLR::PaddleCLR(PAD_VENDOR_ID, PAD_PRODUCT_ID, PAD_API_KEY, PAD_PRODUCT_NAME, PAD_VENDOR_NAME);
 
    paddle.SetBeginTransactionCallback(beginTransactionCallback);
@@ -165,7 +182,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    paddle.ShowCheckoutWindow(PAD_PRODUCT_ID);
 
    OutputDebugStringA("Checkout complete\n");
-   OutputDebugStringA("\n");
 
    return TRUE;
 }
