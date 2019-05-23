@@ -11,6 +11,7 @@ using PaddleSDK.Checkout;
 using PaddleSDK.Product;
 using PaddleSDK.Licensing;
 using System.Diagnostics;
+using Newtonsoft.Json;
 
 namespace PaddleWrapper
 {
@@ -202,6 +203,9 @@ namespace PaddleWrapper
 
         private void Paddle_TransactionCompleteEvent(object sender, TransactionCompleteEventArgs e)
         {
+
+            string processStatusJson = JsonConvert.SerializeObject(e.ProcessStatus, Formatting.Indented);
+
             transactionCompleteCallback?.Invoke(
                 e.ProductID,
                 e.UserEmail,
@@ -209,7 +213,7 @@ namespace PaddleWrapper
                 e.LicenseCode,
                 e.OrderID,
                 e.Flagged,
-                e.ProcessStatus.ToString());
+                processStatusJson);
 
             Debug.WriteLine("Paddle_TransactionCompleteEvent");
             Debug.WriteLine(e.ToString());
