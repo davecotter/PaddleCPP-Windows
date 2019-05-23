@@ -6,6 +6,7 @@
 #include "PaddleCLR.h"
 #include <exception>
 #include <iostream>
+#include <string>
 
 #define MAX_LOADSTRING 100
 
@@ -144,6 +145,13 @@ void __stdcall transactionErrorCallback(const char* error)
 {
 	OutputDebugStringA("transactionErrorCallback\n");
 	OutputDebugStringA(error);
+}
+
+void __stdcall productActivateCallback(int stateCode, const char* stateString)
+{
+    OutputDebugStringA("productActivateCallback\n");
+    OutputDebugStringA(std::to_string(stateCode).c_str());
+    OutputDebugStringA(stateString);
 }
 
 

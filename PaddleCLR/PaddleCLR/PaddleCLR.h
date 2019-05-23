@@ -5,6 +5,7 @@
 typedef void(__stdcall *CallbackWithStringType)(const char*);
 typedef void(__stdcall *CallbackType)(void);
 typedef void(__stdcall *CallbackTransactionCompleteType)(const char*, const char*, const char*, const char*, const char*, bool, const char*);
+typedef void(__stdcall *CallbackActivateType)(int, const char*);
 
 class PaddleWrapperPrivate;
 
@@ -46,6 +47,7 @@ public:
 	void SetBeginTransactionCallback(CallbackType functionPtr);
 	void SetTransactionCompleteCallback(CallbackTransactionCompleteType functionPtr);
 	void SetTransactionErrorCallback(CallbackWithStringType functionPtr);
+    void SetProductActivateCallback(CallbackActivateType functionPtr);
 
     enum PaddleWindowType { ProductAccess, Checkout, LicenseActivation };
 	

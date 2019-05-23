@@ -68,3 +68,12 @@ void PaddleCLR::SetTransactionErrorCallback(CallbackWithStringType functionPtr)
 
 	wrapper->paddle->transactionErrorCallback = callback;
 }
+
+void PaddleCLR::SetProductActivateCallback(CallbackActivateType functionPtr)
+{
+    auto callback = (PaddleWrapper::PaddleWrapper::CallbackActivateDelegate^) Marshal::GetDelegateForFunctionPointer(
+        System::IntPtr(functionPtr),
+        PaddleWrapper::PaddleWrapper::CallbackActivateDelegate::typeid);
+
+    wrapper->paddle->activateCallback = callback;
+}
