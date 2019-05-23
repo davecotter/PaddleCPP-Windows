@@ -41,9 +41,13 @@ public:
 	PaddleCLR(const char* vendorId, const char* productId, const char* apiKey, const char* productName, const char* vendorName);
 	~PaddleCLR();
 	void ShowCheckoutWindow(const char* productId);
+	void ShowProductAccessWindow(const char* productId);
+	void ShowLicenseActivationWindow(const char* productId);
 	void SetBeginTransactionCallback(CallbackType functionPtr);
 	void SetTransactionCompleteCallback(CallbackTransactionCompleteType functionPtr);
 	void SetTransactionErrorCallback(CallbackWithStringType functionPtr);
+
+    enum PaddleWindowType { ProductAccess, Checkout, LicenseActivation };
 	
 private: 
 	PaddleWrapperPrivate* wrapper;

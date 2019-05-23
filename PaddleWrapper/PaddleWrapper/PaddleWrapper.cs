@@ -14,6 +14,8 @@ using System.Diagnostics;
 
 namespace PaddleWrapper
 {
+    public enum PaddleWindowType { ProductAccess, Checkout, LicenseActivation };
+
     public class PaddleWrapper
     {
         private string vendorId;
@@ -23,16 +25,18 @@ namespace PaddleWrapper
         private string productName;
         private string vendorName;
 
-        PaddleProduct currentProduct;
+        private PaddleProduct currentProduct;
+        private PaddleWindowType currentWindowType;
 
         private Thread thread;
         private SynchronizationContext ctx;
         private ManualResetEvent mre;
 
-        public delegate void ShowCheckoutDelegate(PaddleProduct product);
-        ShowCheckoutDelegate showCheckoutDelegate;
 
-        // delegates used for native C++ callback functions
+        public delegate void ShowProductWindowDelegate(PaddleProduct product);
+        ShowProductWindowDelegate showProductWindowDelegate;
+
+        // Delegates used for native C++ callback functions
         public delegate void CallbackDelegate();
         public delegate void CallbackWithStringDelegate(string s);
         public delegate void CallbackTransactionCompleteDelegate(string ProductID, 
@@ -71,12 +75,12 @@ namespace PaddleWrapper
             Paddle.Instance.TransactionErrorEvent    += Paddle_TransactionErrorEvent;
         }
 
-        public void ShowCheckoutWindow()
+        public void ShowPaddleWindow(int windowType)
         {
-            ShowCheckoutWindow(productId);
+            ShowPaddleWindow(productId, windowType);
         }
 
-        public void ShowCheckoutWindow(string specifiedProductId)
+        public void ShowPaddleWindow(string specifiedProductId, int windowType)
         {
 
             // Initialize the Product you'd like to work with
@@ -87,28 +91,40 @@ namespace PaddleWrapper
             product.Refresh((success) =>
             {
                 currentProduct = product;
-                // product data was successfully refreshed
+                currentWindowType = (PaddleWindowType) windowType;
+
+                // Product data was successfully refreshed
                 if (success)
                 {
                     if (!product.Activated)
                     {
                         // Product is not activated, so let's show the Product Access dialog to gatekeep your app
-                        StartCheckoutThread();
+                        StartWindowThread();
                     }
                 }
                 else
                 {
                     // The SDK was unable to get the last info from the Paddle Platform.
                     // We can show the Product Access dialog with the data provided in the PaddleProductConfig object.
-                    StartCheckoutThread();
+                    StartWindowThread();
                 }
             });
 
         }
 
-        private static void ShowCheckout(PaddleProduct product)
+        private static void ShowCheckoutWindow(PaddleProduct product)
         {
             Paddle.Instance.ShowCheckoutWindowForProduct(product);
+        }
+
+        private static void ShowProductAccessWindow(PaddleProduct product)
+        {
+            Paddle.Instance.ShowProductAccessWindowForProduct(product);
+        }
+
+        private static void ShowLicenseActivationWindow(PaddleProduct product)
+        {
+            Paddle.Instance.ShowLicenseActivationWindowForProduct(product);
         }
 
         //-------------------------------------------------------------------
@@ -121,11 +137,11 @@ namespace PaddleWrapper
             mre.Set();
             Application.Idle -= Initialize;
             if (ctx == null) throw new ObjectDisposedException("STAThread");
-            showCheckoutDelegate = ShowCheckout;
-            ctx.Send((_) => showCheckoutDelegate.Invoke(currentProduct), null);
+            showProductWindowDelegate = ShowCheckoutWindow;
+            ctx.Send((_) => showProductWindowDelegate.Invoke(currentProduct), null);
         }
 
-        private void StartCheckoutThread()
+        private void StartWindowThread()
         {
             using (mre = new ManualResetEvent(false))
             {

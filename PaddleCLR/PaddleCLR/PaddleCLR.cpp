@@ -8,13 +8,13 @@ using namespace System::Runtime::InteropServices;
 
 class PaddleWrapperPrivate
 {
-public: msclr::auto_gcroot<PaddleWrapper::PaddleWrapper^> paddleAPI;
+public: msclr::auto_gcroot<PaddleWrapper::PaddleWrapper^> paddle;
 };
 
 PaddleCLR::PaddleCLR(const char* vendorId, const char* productId, const char* apiKey, const char* productName, const char* vendorName)
 {
 	wrapper = new PaddleWrapperPrivate();
-	wrapper->paddleAPI = gcnew PaddleWrapper::PaddleWrapper(
+	wrapper->paddle = gcnew PaddleWrapper::PaddleWrapper(
 		gcnew System::String(vendorId), 
 		gcnew System::String(productId), 
 		gcnew System::String(apiKey), 
@@ -29,7 +29,17 @@ PaddleCLR::~PaddleCLR()
 
 void PaddleCLR::ShowCheckoutWindow(const char* productId)
 {
-	wrapper->paddleAPI->ShowCheckoutWindow(gcnew System::String(productId));
+	wrapper->paddle->ShowPaddleWindow(gcnew System::String(productId), PaddleWindowType::Checkout);
+}
+
+void PaddleCLR::ShowProductAccessWindow(const char* productId)
+{
+	wrapper->paddle->ShowPaddleWindow(gcnew System::String(productId), PaddleWindowType::ProductAccess);
+}
+
+void PaddleCLR::ShowLicenseActivationWindow(const char* productId)
+{
+	wrapper->paddle->ShowPaddleWindow(gcnew System::String(productId), PaddleWindowType::LicenseActivation);
 }
 
 void PaddleCLR::SetBeginTransactionCallback(CallbackType functionPtr)
@@ -38,7 +48,7 @@ void PaddleCLR::SetBeginTransactionCallback(CallbackType functionPtr)
 		System::IntPtr(functionPtr), 
 		PaddleWrapper::PaddleWrapper::CallbackDelegate::typeid);
 
-	wrapper->paddleAPI->beginTransactionCallback = callback;
+	wrapper->paddle->beginTransactionCallback = callback;
 }
 
 void PaddleCLR::SetTransactionCompleteCallback(CallbackTransactionCompleteType functionPtr)
@@ -47,7 +57,7 @@ void PaddleCLR::SetTransactionCompleteCallback(CallbackTransactionCompleteType f
 		System::IntPtr(functionPtr), 
 		PaddleWrapper::PaddleWrapper::CallbackTransactionCompleteDelegate::typeid);
 
-	wrapper->paddleAPI->transactionCompleteCallback = callback;
+	wrapper->paddle->transactionCompleteCallback = callback;
 }
 
 void PaddleCLR::SetTransactionErrorCallback(CallbackWithStringType functionPtr)
@@ -56,5 +66,5 @@ void PaddleCLR::SetTransactionErrorCallback(CallbackWithStringType functionPtr)
 		System::IntPtr(functionPtr),
 		PaddleWrapper::PaddleWrapper::CallbackWithStringDelegate::typeid);
 
-	wrapper->paddleAPI->transactionErrorCallback = callback;
+	wrapper->paddle->transactionErrorCallback = callback;
 }
