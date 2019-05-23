@@ -182,7 +182,7 @@ namespace PaddleWrapper
             PaddleProduct product = PaddleProduct.CreateProduct(productId);
             product.ActivateWithEmail(email, license, (VerificationState state, string s) =>
             {
-                activateCallback(Convert.ToInt32(state), s);
+                activateCallback?.Invoke(Convert.ToInt32(state), s);
             });
         }
 
@@ -221,5 +221,6 @@ namespace PaddleWrapper
             Debug.WriteLine("Paddle_TransactionErrorEvent");
             Debug.WriteLine(e.ToString());
         }
+
     }
 }
