@@ -35,13 +35,13 @@ void __stdcall beginTransactionCallback()
 	OutputDebugStringA("beginTransactionCallback\n");
 }
 
-void __stdcall transactionCompleteCallback(const char* productID, 
-										   const char* userEmail, 
-										   const char* userCountry, 
-	                                       const char* licenseCode, 
-	                                       const char* orderID, 
-	                                       bool flagged, 
-	                                       const char* processStatusJson)
+void __stdcall transactionCompleteCallback(const char* productID,
+                                           const char* userEmail,
+					   const char* userCountry,
+					   const char* licenseCode,
+					   const char* orderID,
+					   bool flagged,
+					   const char* processStatusJson)
 {
 	OutputDebugStringA("transactionCompleteCallback:\n");
 	OutputDebugStringA(productID);
