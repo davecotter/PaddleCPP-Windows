@@ -20,7 +20,7 @@
  * Copy and paste into "PaddleCredentials.h" and add your own details 
  * to use your Paddle account
  */
- #define	PAD_VENDOR_ID               "11745"
+ #define    PAD_VENDOR_ID               "11745"
  #define    PAD_VENDOR_NAME             "My Company"
  #define    PAD_API_KEY                 "4134242689d26430f89ec0858884ab07"
  #define    PAD_PRODUCT_ID              "511013"

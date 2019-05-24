@@ -105,8 +105,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\..\PaddleCLR\PaddleCLR\$(PlatformTarget)\$(Configuration);..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>PaddleCLR.lib;PaddleWrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\$(PlatformTarget)\$(Configuration);..\..\PaddleCLR\$(PlatformTarget)\$(Configuration);..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>PaddleCLR.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ProjectReference>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
