@@ -5,7 +5,27 @@
 ### Setup
 (Tested with VS2017)
 
-#### Using pre-built DLLs 
+
+
+#### Build instructions
+
+You may need to open the PaddleWrapper project, and make sure that the PaddleSDK has installed correctly from NuGet. 
+Make sure this project builds on its own. 
+
+You should then be able to open, build and run PaddleExample. 
+
+#### Adding to your project
+
+Either:
+
+##### Add projects to your solution 
+
+Add PaddleWrapper and PaddleCLR to your solution
+
+Add "PaddleCLR.lib" in the Linker/Input section
+Add the path of PaddleCLR.lib to "Additional Library Directories" in Linker/General
+
+##### Add pre-built DLLs
 
 Copy all DLLs in either `Debug` or `Release` folders to your project build folder.
 
@@ -14,16 +34,6 @@ Add `PaddleCLR\PaddleCLR` to "Additional header search paths" (In C/C++ section)
 Add `PaddleCLR\Debug` or `PaddleCLR\Release` to "Additional library paths" (In Linker/General section)
 
 Add `PaddleCLR.lib` to "Additional dependencies" (Linker/Input section)
-
-#### Building from scratch
-
-Open the PaddleCLR solution in Visual Studio
-
-Build
-
-[This step to be automated]
-
-Copy all DLLs in the `PaddleCLR\Debug` folder to the example project's `Debug` folder. 
 
 ### Example code
 
