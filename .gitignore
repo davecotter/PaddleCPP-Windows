@@ -382,3 +382,4 @@ MigrationBackup/
 
 # End of https://www.gitignore.io/api/c++,visualstudio
 .DS_Store
+/nuget
