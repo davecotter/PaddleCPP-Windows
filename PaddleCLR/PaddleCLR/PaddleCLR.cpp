@@ -1,13 +1,8 @@
 #include "stdafx.h"
 
 #include <msclr\auto_gcroot.h>
-
+#using "PaddleWrapper.dll"
 #include "PaddleCLR.h"
-
-//	none of these worked
-//#using "PaddleWrapper"
-//#using "PaddleWrapper.cs"
-//#include "PaddleWrapper.cs"
 
 using namespace System::Runtime::InteropServices; 
 
