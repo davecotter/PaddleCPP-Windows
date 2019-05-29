@@ -8,6 +8,9 @@
 #include <exception>
 #include <iostream>
 #include <string>
+#include "rapidjson/document.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/prettywriter.h"
 
 #define MAX_LOADSTRING 100
 
@@ -157,6 +160,24 @@ void __stdcall productActivateCallback(int stateCode, const char* stateString)
     OutputDebugStringA(stateString);
 }
 
+static std::string		JSON_ConvertToString(rapidjson::Document& doc)
+{
+	rapidjson::StringBuffer								strbuf;
+	rapidjson::PrettyWriter<rapidjson::StringBuffer>	writer(strbuf);
+
+	doc.Accept(writer);
+	return reinterpret_cast<const char *>(strbuf.GetString());
+}
+
+//	please keep these json key strings (don't change)
+#define		kPaddleCmdKey_SKU				"SKU"
+#define		kPaddleCmdKey_EMAIL				"email"
+#define		kPaddleCmdKey_SERIAL_NUMBER		"serial number"
+#define		kPaddleCmdKey_COUPON			"coupon"
+#define		kPaddleCmdKey_COUNTRY			"country"
+#define		kPaddleCmdKey_POSTCODE			"postcode"
+#define		kPaddleCmdKey_TITLE				"title"		//	product title
+#define		kPaddleCmdKey_MESSAGE			"message"	//	product description
 
 //
 //   FUNCTION: InitInstance(HINSTANCE, int)
@@ -198,6 +219,40 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	paddle.CreateInstance(PAD_PRODUCT_ID);
 
+	//	 validate test
+	{
+		rapidjson::Document						validateCmd;
+		rapidjson::Document::AllocatorType&		allocator = validateCmd.GetAllocator();
+
+		validateCmd.SetObject();
+		validateCmd.AddMember(kPaddleCmdKey_SKU, PAD_PRODUCT_ID, allocator);
+		
+		std::string		resultStr = paddle.Validate(JSON_ConvertToString(validateCmd));
+
+		OutputDebugStringA(resultStr.c_str());
+	}
+
+	//	Activate:
+	//	kPaddleCmdKey_SKU
+	//	kPaddleCmdKey_EMAIL
+	//	kPaddleCmdKey_SERIAL_NUMBER
+
+	//	Purchase:
+	//	kPaddleCmdKey_SKU
+	//	kPaddleCmdKey_EMAIL
+	//	kPaddleCmdKey_COUPON
+	//	kPaddleCmdKey_COUNTRY
+	//	kPaddleCmdKey_POSTCODE
+	//	kPaddleCmdKey_TITLE
+	//	kPaddleCmdKey_MESSAGE
+
+	//	Deactivate:
+	//	kPaddleCmdKey_SKU
+
+	//	RecoverLicense:
+	//	kPaddleCmdKey_SKU
+	//	kPaddleCmdKey_EMAIL
+
 	paddle.SetBeginTransactionCallback(beginTransactionCallback);
 	paddle.SetTransactionCompleteCallback(transactionCompleteCallback);
 	paddle.SetTransactionErrorCallback(transactionErrorCallback);
@@ -207,8 +262,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	OutputDebugStringA("Checkout complete\n");
 	return TRUE;
 }
-
-
 
 //
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #define DllExport   __declspec(dllexport)
 
 typedef void(__stdcall *CallbackWithStringType)(const char*);
@@ -34,6 +36,12 @@ public:
 	void	CreateInstance(PaddleProductID productID);
 
 	void	debug_print(const char *str);
+
+	std::string			Validate(const std::string& jsonCmd);
+	std::string			Activate(const std::string& jsonCmd);
+	std::string			Purchase(const std::string& jsonCmd);
+	std::string			Deactivate(const std::string& jsonCmd);
+	std::string			RecoverLicense(const std::string& jsonCmd);
 
 	void ShowCheckoutWindow(PaddleProductID productId);
 	void ShowProductAccessWindow(PaddleProductID productId);

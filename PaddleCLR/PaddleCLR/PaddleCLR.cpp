@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include <msclr\auto_gcroot.h>
 #include <assert.h>
 #using "PaddleWrapper.dll"
@@ -52,6 +51,57 @@ void	PaddleCLR::CreateInstance(PaddleProductID productID)
 	i_wrapperP->paddleRef->CreateInstance(productID);
 }
 
+// ----------------------------------------------------------------------------
+static	std::string		StringConvert_SystemToStd_UTF8(System::String^ str)
+{
+	array<System::Byte>^	encodedBytes	= System::Text::Encoding::UTF8->GetBytes(str + "\0");
+	pin_ptr<System::Byte>	pinnedBytes		= &encodedBytes[0];
+	std::string				stdStr			= reinterpret_cast<char*>(pinnedBytes);
+
+	return stdStr;
+}
+
+std::string			PaddleCLR::Validate(const std::string& jsonCmd)
+{
+	System::String^		returnStr = i_wrapperP->paddleRef->Validate(
+		gcnew System::String(jsonCmd.c_str()));
+	
+	return StringConvert_SystemToStd_UTF8(returnStr);
+}
+
+std::string			PaddleCLR::Activate(const std::string& jsonCmd)
+{
+	System::String^		returnStr = i_wrapperP->paddleRef->Activate(
+		gcnew System::String(jsonCmd.c_str()));
+	
+	return StringConvert_SystemToStd_UTF8(returnStr);
+}
+
+std::string			PaddleCLR::Purchase(const std::string& jsonCmd)
+{
+	System::String^		returnStr = i_wrapperP->paddleRef->Purchase(
+		gcnew System::String(jsonCmd.c_str()));
+	
+	return StringConvert_SystemToStd_UTF8(returnStr);
+}
+
+std::string			PaddleCLR::Deactivate(const std::string& jsonCmd)
+{
+	System::String^		returnStr = i_wrapperP->paddleRef->Deactivate(
+		gcnew System::String(jsonCmd.c_str()));
+	
+	return StringConvert_SystemToStd_UTF8(returnStr);
+}
+
+std::string			PaddleCLR::RecoverLicense(const std::string& jsonCmd)
+{
+	System::String^		returnStr = i_wrapperP->paddleRef->RecoverLicense(
+		gcnew System::String(jsonCmd.c_str()));
+	
+	return StringConvert_SystemToStd_UTF8(returnStr);
+}
+
+// ----------------------------------------------------------------------------
 void PaddleCLR::ShowCheckoutWindow(PaddleProductID productId)
 {
 	i_wrapperP->paddleRef->ShowPaddleWindow(productId, PaddleWindowType::Checkout);

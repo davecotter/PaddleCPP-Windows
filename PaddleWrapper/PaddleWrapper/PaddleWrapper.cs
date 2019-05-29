@@ -113,13 +113,23 @@ namespace PaddleWrapper
 				ProductName		= prodRec.nameStr, 
 				VendorName		= i_vendorNameStr,
 				TrialType		= PaddleSDK.Product.TrialType.None,
-				TrialText		= prodRec.localizedTrialStr
+				TrialText		= prodRec.localizedTrialStr,
+				Currency		= "USD",
+				ImagePath		= ""
 			};
 
-	//			Currency		= "USD"
-			//				ImagePath		= ""
-
 			return config;
+		}
+
+		PaddleProduct				Paddle_GetProduct(PaddleProductID productID)
+		{
+			PaddleProduct			product	= PaddleProduct.CreateProduct(
+				productID.ToString(),
+				PaddleSDK.Product.ProductType.SDKProduct,
+				Paddle_GetConfig(productID));
+			
+			product.CanForceExit = false;
+			return product;
 		}
 
 		public PaddleWrapper(
@@ -155,10 +165,45 @@ namespace PaddleWrapper
 			//	canForceExit = false
 		}
 
+		public string					Validate(string jsonCmd)
+		{
+			string		jsonResult = jsonCmd;	//	to test round trip
+
+			return jsonResult;
+		}
+
+		public string					Activate(string jsonCmd)
+		{
+			string		jsonResult = "";
+
+			return jsonResult;
+		}
+
+		public string					Purchase(string jsonCmd)
+		{
+			string		jsonResult = "";
+
+			return jsonResult;
+		}
+
+		public string					Deactivate(string jsonCmd)
+		{
+			string		jsonResult = "";
+
+			return jsonResult;
+		}
+
+		public string					RecoverLicense(string jsonCmd)
+		{
+			string		jsonResult = "";
+
+			return jsonResult;
+		}
+
 		public void ShowPaddleWindow(PaddleProductID productID, int windowType)
 		{
 			// Initialize the Product you'd like to work with
-			var product = PaddleProduct.CreateProduct(productID.ToString());
+			var product = Paddle_GetProduct(productID);
 
 			// Ask the Product to get it's latest state and info from the Paddle Platform
 			product.Refresh((success) =>
@@ -253,7 +298,8 @@ namespace PaddleWrapper
 		public void Activate(string productId, string email, string license)
 		{
 			// Initialize the Product you'd like to work with
-			PaddleProduct product = PaddleProduct.CreateProduct(productId);
+			PaddleProduct product = Paddle_GetProduct(Int32.Parse(productId));
+
 			product.ActivateWithEmail(email, license, (VerificationState state, string s) =>
 			{
 				activateCallback?.Invoke(Convert.ToInt32(state), s);
