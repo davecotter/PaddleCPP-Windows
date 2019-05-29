@@ -1,16 +1,22 @@
-set SRC_PATH=%1
-set TargetDir=%2
-set FILE_LIST=(StructureMap RGiesecke.DllExport.Metadata Newtonsoft.Json Interop.SHDocVw CredentialManagement)
+set SolutionDir=%1
+set TARG_CONFIG=%2
+set TargetDir=%3
 
+set FILE_LIST=(StructureMap RGiesecke.DllExport.Metadata Newtonsoft.Json Interop.SHDocVw CredentialManagement)
+set SRC_PATH=%SolutionDir%..\PaddleWrapper\PaddleWrapper\%TARG_CONFIG%
 for %%i in %FILE_LIST% do (
-	echo	Copying %%i...
-	copy "%SRC_PATH%\%%i.dll" "%TargetDir%"
+	CALL :copy_file %SRC_PATH%,%%i.dll,%TargetDir%
 )
 
-set i=PaddleWrapper.pdb
-echo	Copying %i%...
-copy "%SRC_PATH%\%i%" "%TargetDir%"
+CALL :copy_file %SRC_PATH%,PaddleWrapper.pdb,%TargetDir%
 
-set i=PaddleCLR.pdb
-echo	Copying %i%...
-copy "%SRC_PATH%\..\..\..\..\..\PaddleCLR\PaddleCLR\bin\x86\Debug\%i%" "%TargetDir%"
+set PADDLECLR_PATH=%SolutionDir%..\PaddleCLR\PaddleCLR\%TARG_CONFIG%
+CALL :copy_file %PADDLECLR_PATH%,PaddleCLR.pdb,%TargetDir%
+
+EXIT /B %ERRORLEVEL%
+
+:copy_file
+set LOCAL_FILE=%~2
+echo	Copying %LOCAL_FILE%...
+copy "%~1\%LOCAL_FILE%" "%~3"
+EXIT /B 0

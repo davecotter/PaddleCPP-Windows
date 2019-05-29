@@ -129,9 +129,8 @@
       </Message>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>set SRC_PATH=$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration)
-call $(ProjectDir)post_build.bat %SRC_PATH% $(TargetDir)
-</Command>
+      <Command>set TARG_CONFIG=bin\$(PlatformTarget)\$(Configuration)
+call $(ProjectDir)post_build.bat $(SolutionDir) %TARG_CONFIG% $(TargetDir)</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copying Libraries...</Message>
@@ -164,9 +163,8 @@ call $(ProjectDir)post_build.bat %SRC_PATH% $(TargetDir)
       </Message>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>set SRC_PATH=$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration)
-call $(ProjectDir)post_build.bat %SRC_PATH% $(TargetDir)
-</Command>
+      <Command>set TARG_CONFIG=bin\$(PlatformTarget)\$(Configuration)
+call $(ProjectDir)post_build.bat $(SolutionDir) %TARG_CONFIG% $(TargetDir)</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copying Libraries...</Message>
@@ -203,9 +201,8 @@ call $(ProjectDir)post_build.bat %SRC_PATH% $(TargetDir)
       </Message>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>set SRC_PATH=$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration)
-call $(ProjectDir)post_build.bat %SRC_PATH% $(TargetDir)
-</Command>
+      <Command>set TARG_CONFIG=bin\$(PlatformTarget)\$(Configuration)
+call $(ProjectDir)post_build.bat $(SolutionDir) %TARG_CONFIG% $(TargetDir)</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copying Libraries...</Message>
@@ -242,9 +239,8 @@ call $(ProjectDir)post_build.bat %SRC_PATH% $(TargetDir)
       </Message>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>set SRC_PATH=$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration)
-call $(ProjectDir)post_build.bat %SRC_PATH% $(TargetDir)
-</Command>
+      <Command>set TARG_CONFIG=bin\$(PlatformTarget)\$(Configuration)
+call $(ProjectDir)post_build.bat $(SolutionDir) %TARG_CONFIG% $(TargetDir)</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copying Libraries...</Message>

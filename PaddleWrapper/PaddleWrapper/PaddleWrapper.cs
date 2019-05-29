@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 
 using PaddleSDK;
 using PaddleSDK.Checkout;
 using PaddleSDK.Product;
 using PaddleSDK.Licensing;
-using System.Diagnostics;
-using Newtonsoft.Json;
 
 namespace PaddleWrapper
 {
@@ -60,6 +60,12 @@ namespace PaddleWrapper
 		public CallbackWithStringDelegate			transactionErrorCallback;
 		public CallbackActivateDelegate				activateCallback;
 
+		void	debug_print(string str)
+		{
+			Console.WriteLine(str);
+			Debug.WriteLine(str);
+		}
+
 		public class PaddleProductRec
 		{
 			public string nameStr;
@@ -78,20 +84,29 @@ namespace PaddleWrapper
 		//	sneaky way to do a typedef in C#
 		public class PaddleProductMap: SortedDictionary<PaddleProductID, PaddleProductRec> { }
 
-		PaddleProductMap			i_prodMap = new PaddleProductMap();
+		PaddleProductMap		i_prodMap = new PaddleProductMap();
 
 		public void AddProduct(PaddleProductID prodID, string nameStr, string localizedTrialStr)
 		{
+			debug_print(String.Format(
+				"about to add product: {0}: {1}", 
+				prodID, nameStr));
+			
 			i_prodMap[prodID] = new PaddleProductRec(nameStr, localizedTrialStr);
+
+			debug_print("added");
 		}
 
 		public PaddleProductRec		GetProduct(PaddleProductID prodID)
 		{
+			debug_print(String.Format(
+				"about to find product: {0}", prodID));
+
 			if	(i_prodMap.ContainsKey(prodID)) {
 				return i_prodMap[prodID];
 			}
 			
-			Console.WriteLine("no product: {0}", prodID);
+			debug_print(String.Format("no product: {0}", prodID));
 
 			return new PaddleProductRec();
 		}
@@ -99,6 +114,10 @@ namespace PaddleWrapper
 		PaddleProductConfig			Paddle_GetConfig(PaddleProductID prodID)
 		{
 			PaddleProductRec		prodRec		= GetProduct(prodID);
+
+			debug_print(String.Format(
+				"about to get config: {0}", prodRec.nameStr));
+
 			PaddleProductConfig		config		= new PaddleProductConfig {
 				ProductName		= prodRec.nameStr, 
 				VendorName		= i_vendorNameStr,
@@ -126,6 +145,9 @@ namespace PaddleWrapper
 
 		public void		CreateInstance(PaddleProductID productID)
 		{
+			debug_print(String.Format(
+				"about to create instance: {0}", productID));
+
 			string		vendorStr	= i_vendorID.ToString();
 			string		productStr	= productID.ToString();
 
