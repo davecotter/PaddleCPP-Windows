@@ -9,49 +9,36 @@ typedef void(__stdcall *CallbackActivateType)(int, const char*);
 
 class PaddleWrapperPrivate;
 
-/** event contents:
-// TransactionCompleteEvent
-public string ProductID{ get; set; }
-public string UserEmail{ get; set; }
-public string UserCountry{ get; set; }
-public string LicenseCode{ get; set; }
-public string OrderID{ get; set; }
-public bool Flagged{ get; set; }
-public ProcessStatus ProcessStatus{ get; set; }
-
-// ProcessStatus
-[JsonProperty("state")]
-public string State{ get; set; }
-[JsonProperty("checkout")]
-public CheckOut Checkout{ get; set; }
-[JsonProperty("order")]
-public Order Order{ get; set; }
-[JsonProperty("lockers")]
-public List<Locker> Lockers{ get; set; }
-public string ProductID{ get; }
-public string CustomerEmail{ get; }
-public string LicenseCode{ get; }
-public string LockerID{ get; }
-public string OrderID{ get; }
-*/
-
-
 class DllExport PaddleCLR
 {
+	PaddleWrapperPrivate	*wrapperP;
+
 public:
-	PaddleCLR(const char* vendorId, const char* productId, const char* apiKey, const char* productName, const char* vendorName);
+	typedef int		PaddleProductID;
+
+	enum PaddleWindowType {
+		ProductAccess,
+		Checkout,
+		LicenseActivation
+	};
+
+	PaddleCLR(
+		int					vendorID,
+		const char			*vendorNameStr,
+		const char			*vendorAuthStr,
+		const char			*apiKeyStr);
+
 	~PaddleCLR();
-	void ShowCheckoutWindow(const char* productId);
-	void ShowProductAccessWindow(const char* productId);
-	void ShowLicenseActivationWindow(const char* productId);
+
+	void	AddProduct(PaddleProductID prodID, const char *nameStr, const char *localizedTrialStr);
+	void	CreateInstance(PaddleProductID productID);
+
+	void ShowCheckoutWindow(PaddleProductID productId);
+	void ShowProductAccessWindow(PaddleProductID productId);
+	void ShowLicenseActivationWindow(PaddleProductID productId);
+
 	void SetBeginTransactionCallback(CallbackType functionPtr);
 	void SetTransactionCompleteCallback(CallbackTransactionCompleteType functionPtr);
 	void SetTransactionErrorCallback(CallbackWithStringType functionPtr);
-    void SetProductActivateCallback(CallbackActivateType functionPtr);
-
-    enum PaddleWindowType { ProductAccess, Checkout, LicenseActivation };
-	
-private: 
-	PaddleWrapperPrivate* wrapper;
-
+    void SetProductActivateCallback(CallbackActivateType functionPtr);	
 };

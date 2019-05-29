@@ -20,11 +20,13 @@
  * Copy and paste into "PaddleCredentials.h" and add your own details 
  * to use your Paddle account
  */
- #define    PAD_VENDOR_ID               "11745"
- #define    PAD_VENDOR_NAME             "My Company"
- #define    PAD_API_KEY                 "4134242689d26430f89ec0858884ab07"
- #define    PAD_PRODUCT_ID              "511013"
- #define    PAD_PRODUCT_NAME            "MyCoolApp"
+#define    PAD_VENDOR_ID               11745
+#define    PAD_VENDOR_NAME             "My Company"
+#define    PAD_VENDOR_AUTH             "this is not a real vendor auth string"
+#define    PAD_API_KEY                 "4134242689d26430f89ec0858884ab07"
+
+#define    PAD_PRODUCT_ID              511013
+#define    PAD_PRODUCT_NAME            "MyCoolApp"
 #endif
 
 //---------------------------------------------------------------------------
@@ -181,8 +183,18 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    UpdateWindow(hWnd);
 
    // Relevant example code starts here: 
+   auto  paddle = PaddleCLR::PaddleCLR(
+		PAD_VENDOR_ID, 
+		PAD_VENDOR_NAME,
+		PAD_VENDOR_AUTH,
+		PAD_API_KEY);
 
-   auto paddle = PaddleCLR::PaddleCLR(PAD_VENDOR_ID, PAD_PRODUCT_ID, PAD_API_KEY, PAD_PRODUCT_NAME, PAD_VENDOR_NAME);
+	paddle.AddProduct(
+		PAD_PRODUCT_ID,
+		PAD_PRODUCT_NAME,
+		"Thanks for trying " PAD_PRODUCT_NAME);
+
+	paddle.CreateInstance(PAD_PRODUCT_ID);
 
    paddle.SetBeginTransactionCallback(beginTransactionCallback);
    paddle.SetTransactionCompleteCallback(transactionCompleteCallback);

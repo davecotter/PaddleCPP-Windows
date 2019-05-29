@@ -15,38 +15,44 @@ using Newtonsoft.Json;
 
 namespace PaddleWrapper
 {
-	public enum PaddleWindowType { ProductAccess, Checkout, LicenseActivation };
+	using PaddleProductID = System.Int32;
+
+	public enum PaddleWindowType {
+		ProductAccess,
+		Checkout, 
+		LicenseActivation
+	};
 
 	public class PaddleWrapper
 	{
-		private string vendorId;
-		private string productId;
-		private string apiKey;
+		private int		i_vendorID;
+		private string	i_vendorNameStr;
+		private string	i_vendorAuthStr;
+		private string	i_apiKeyStr;
 
-		private string productName;
-		private string vendorName;
+		private PaddleProduct		i_currentProduct;
+		private PaddleWindowType	i_currentWindowType;
 
-		private PaddleProduct currentProduct;
-		private PaddleWindowType currentWindowType;
-
-		private Thread thread;
-		private SynchronizationContext ctx;
-		private ManualResetEvent mre;
-
+		private Thread					thread;
+		private SynchronizationContext	ctx;
+		private ManualResetEvent		mre;
 
 		public delegate void ShowProductWindowDelegate(PaddleProduct product);
-		ShowProductWindowDelegate showProductWindowDelegate;
+
+		ShowProductWindowDelegate		showProductWindowDelegate;
 
 		// Delegates used for native C++ callback functions
 		public delegate void CallbackDelegate();
 		public delegate void CallbackWithStringDelegate(string s);
-		public delegate void CallbackTransactionCompleteDelegate(string ProductID, 
-																 string UserEmail, 
-																 string UserCountry, 
-																 string LicenseCode,
-																 string OrderID,
-																 bool	Flagged,
-																 string ProcessStatus);
+		public delegate void CallbackTransactionCompleteDelegate(
+			string productIDStr, 
+			string userEmailStr, 
+			string userCountryStr, 
+			string licenseCodeStr,
+			string orderID,
+			bool   flaggedB,
+			string processStatusStr);
+
 		public delegate void CallbackActivateDelegate(int verificationState, string verificationString);
 
 		public CallbackDelegate						beginTransactionCallback;
@@ -54,47 +60,101 @@ namespace PaddleWrapper
 		public CallbackWithStringDelegate			transactionErrorCallback;
 		public CallbackActivateDelegate				activateCallback;
 
-		public PaddleWrapper(string vendorId, string productId, string apiKey, string productName = "", string vendorName = "")
+		public class PaddleProductRec
 		{
-			this.vendorId	 = vendorId;
-			this.productId	 = productId;
-			this.apiKey		 = apiKey;
-			this.productName = productName;
-			this.vendorName	 = vendorName;
+			public string nameStr;
+			public string localizedTrialStr;
 
-			PaddleProductConfig productInfo;
+			//	for compatability with STL containers
+			public PaddleProductRec() { }
 
-			// Default Product Config in case we're unable to reach our servers on first run
-			productInfo = new PaddleProductConfig { ProductName = this.productName, VendorName = this.vendorName };
+			public PaddleProductRec(string in_nameStr, string in_localizedTrialStr)
+			{
+				this.nameStr = in_nameStr;
+				this.localizedTrialStr = in_localizedTrialStr;
+			}
+		}
 
+		//	sneaky way to do a typedef in C#
+		public class PaddleProductMap: SortedDictionary<PaddleProductID, PaddleProductRec> { }
+
+		PaddleProductMap			i_prodMap = new PaddleProductMap();
+
+		public void AddProduct(PaddleProductID prodID, string nameStr, string localizedTrialStr)
+		{
+			i_prodMap[prodID] = new PaddleProductRec(nameStr, localizedTrialStr);
+		}
+
+		public PaddleProductRec		GetProduct(PaddleProductID prodID)
+		{
+			if	(i_prodMap.ContainsKey(prodID)) {
+				return i_prodMap[prodID];
+			}
+			
+			Console.WriteLine("no product: {0}", prodID);
+
+			return new PaddleProductRec();
+		}
+
+		PaddleProductConfig			Paddle_GetConfig(PaddleProductID prodID)
+		{
+			PaddleProductRec		prodRec		= GetProduct(prodID);
+			PaddleProductConfig		config		= new PaddleProductConfig {
+				ProductName		= prodRec.nameStr, 
+				VendorName		= i_vendorNameStr,
+				TrialType		= PaddleSDK.Product.TrialType.None,
+				TrialText		= prodRec.localizedTrialStr
+			};
+
+	//			Currency		= "USD"
+			//				ImagePath		= ""
+
+			return config;
+		}
+
+		public PaddleWrapper(
+			int					vendorID,
+			string				vendorNameStr,
+			string				vendorAuthStr,
+			string				apiKeyStr)
+		{
+			i_vendorID		= vendorID;
+			i_vendorNameStr	= vendorNameStr;
+			i_vendorAuthStr	= vendorAuthStr;
+			i_apiKeyStr		= apiKeyStr;
+		}
+
+		public void		CreateInstance(PaddleProductID productID)
+		{
+			string		vendorStr	= i_vendorID.ToString();
+			string		productStr	= productID.ToString();
 
 			// Initialize the SDK singleton with the config
-			Paddle.Configure(apiKey, vendorId, productId, productInfo);
+			Paddle.Configure(
+				i_apiKeyStr, 
+				vendorStr, 
+				productStr, 
+				Paddle_GetConfig(productID));
 
 			Paddle.Instance.TransactionBeginEvent	 += Paddle_TransactionBeginEvent;
 			Paddle.Instance.TransactionCompleteEvent += Paddle_TransactionCompleteEvent;
 			Paddle.Instance.TransactionErrorEvent	 += Paddle_TransactionErrorEvent;
-
 			Paddle.Instance.LicensingCompleteEvent	 += Paddle_LicensingCompleteEvent;
+
+			//	delegate?
+			//	canForceExit = false
 		}
 
-		public void ShowPaddleWindow(int windowType)
+		public void ShowPaddleWindow(PaddleProductID productID, int windowType)
 		{
-			ShowPaddleWindow(productId, windowType);
-		}
-
-		public void ShowPaddleWindow(string specifiedProductId, int windowType)
-		{
-
 			// Initialize the Product you'd like to work with
-			var product = PaddleProduct.CreateProduct(specifiedProductId);
-
+			var product = PaddleProduct.CreateProduct(productID.ToString());
 
 			// Ask the Product to get it's latest state and info from the Paddle Platform
 			product.Refresh((success) =>
 			{
-				currentProduct = product;
-				currentWindowType = (PaddleWindowType) windowType;
+				i_currentProduct = product;
+				i_currentWindowType = (PaddleWindowType) windowType;
 
 				// Product data was successfully refreshed
 				if (success)
@@ -140,8 +200,9 @@ namespace PaddleWrapper
 			mre.Set();
 			Application.Idle -= Initialize;
 			if (ctx == null) throw new ObjectDisposedException("STAThread");
-			switch(currentWindowType)
-			{
+			
+			switch(i_currentWindowType) {
+
 				case PaddleWindowType.Checkout:
 					showProductWindowDelegate = ShowCheckoutWindow;
 					break;
@@ -156,7 +217,7 @@ namespace PaddleWrapper
 					break;
 
 			}
-			ctx.Send((_) => showProductWindowDelegate.Invoke(currentProduct), null);
+			ctx.Send((_) => showProductWindowDelegate.Invoke(i_currentProduct), null);
 		}
 
 		private void StartWindowThread()
