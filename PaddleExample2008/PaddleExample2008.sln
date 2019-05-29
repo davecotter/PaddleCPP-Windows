@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PaddleExample2008", "PaddleExample2008\PaddleExample2008.vcproj", "{C88CDDB9-FA45-45BF-A409-3CEA39B302EC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C88CDDB9-FA45-45BF-A409-3CEA39B302EC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C88CDDB9-FA45-45BF-A409-3CEA39B302EC}.Debug|Win32.Build.0 = Debug|Win32
+		{C88CDDB9-FA45-45BF-A409-3CEA39B302EC}.Release|Win32.ActiveCfg = Release|Win32
+		{C88CDDB9-FA45-45BF-A409-3CEA39B302EC}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
