@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include <msclr\auto_gcroot.h>
+#include <assert.h>
 #using "PaddleWrapper.dll"
 #include "PaddleCLR.h"
 
@@ -17,8 +18,8 @@ PaddleCLR::PaddleCLR(
 	const char			*vendorAuthStr,
 	const char			*apiKeyStr)
 {
-	wrapperP			= new PaddleWrapperPrivate();
-	wrapperP->paddleRef = gcnew PaddleWrapper::PaddleWrapper(
+	i_wrapperP = new PaddleWrapperPrivate();
+	i_wrapperP->paddleRef = gcnew PaddleWrapper::PaddleWrapper(
 		vendorID,
 		gcnew System::String(vendorNameStr),
 		gcnew System::String(vendorAuthStr),
@@ -27,7 +28,12 @@ PaddleCLR::PaddleCLR(
 
 PaddleCLR::~PaddleCLR()
 {
-	delete wrapperP;
+	delete i_wrapperP;
+}
+
+void	PaddleCLR::debug_print(const char *str)
+{
+	i_wrapperP->paddleRef->debug_print(gcnew System::String(str));
 }
 
 void	PaddleCLR::AddProduct(
@@ -35,7 +41,7 @@ void	PaddleCLR::AddProduct(
 	const char			*nameStr, 
 	const char			*localizedTrialStr)
 {
-	wrapperP->paddleRef->AddProduct(
+	i_wrapperP->paddleRef->AddProduct(
 		prodID,
 		gcnew System::String(nameStr),
 		gcnew System::String(localizedTrialStr));
@@ -43,22 +49,22 @@ void	PaddleCLR::AddProduct(
 
 void	PaddleCLR::CreateInstance(PaddleProductID productID)
 {
-	wrapperP->paddleRef->CreateInstance(productID);
+	i_wrapperP->paddleRef->CreateInstance(productID);
 }
 
 void PaddleCLR::ShowCheckoutWindow(PaddleProductID productId)
 {
-	wrapperP->paddleRef->ShowPaddleWindow(productId, PaddleWindowType::Checkout);
+	i_wrapperP->paddleRef->ShowPaddleWindow(productId, PaddleWindowType::Checkout);
 }
 
 void PaddleCLR::ShowProductAccessWindow(PaddleProductID productId)
 {
-	wrapperP->paddleRef->ShowPaddleWindow(productId, PaddleWindowType::ProductAccess);
+	i_wrapperP->paddleRef->ShowPaddleWindow(productId, PaddleWindowType::ProductAccess);
 }
 
 void PaddleCLR::ShowLicenseActivationWindow(PaddleProductID productId)
 {
-	wrapperP->paddleRef->ShowPaddleWindow(productId, PaddleWindowType::LicenseActivation);
+	i_wrapperP->paddleRef->ShowPaddleWindow(productId, PaddleWindowType::LicenseActivation);
 }
 
 void PaddleCLR::SetBeginTransactionCallback(CallbackType functionPtr)
@@ -67,7 +73,7 @@ void PaddleCLR::SetBeginTransactionCallback(CallbackType functionPtr)
 		System::IntPtr(functionPtr), 
 		PaddleWrapper::PaddleWrapper::CallbackDelegate::typeid);
 
-	wrapperP->paddleRef->beginTransactionCallback = callback;
+	i_wrapperP->paddleRef->beginTransactionCallback = callback;
 }
 
 void PaddleCLR::SetTransactionCompleteCallback(CallbackTransactionCompleteType functionPtr)
@@ -76,7 +82,7 @@ void PaddleCLR::SetTransactionCompleteCallback(CallbackTransactionCompleteType f
 		System::IntPtr(functionPtr), 
 		PaddleWrapper::PaddleWrapper::CallbackTransactionCompleteDelegate::typeid);
 
-	wrapperP->paddleRef->transactionCompleteCallback = callback;
+	i_wrapperP->paddleRef->transactionCompleteCallback = callback;
 }
 
 void PaddleCLR::SetTransactionErrorCallback(CallbackWithStringType functionPtr)
@@ -85,7 +91,7 @@ void PaddleCLR::SetTransactionErrorCallback(CallbackWithStringType functionPtr)
 		System::IntPtr(functionPtr),
 		PaddleWrapper::PaddleWrapper::CallbackWithStringDelegate::typeid);
 
-	wrapperP->paddleRef->transactionErrorCallback = callback;
+	i_wrapperP->paddleRef->transactionErrorCallback = callback;
 }
 
 void PaddleCLR::SetProductActivateCallback(CallbackActivateType functionPtr)
@@ -94,5 +100,5 @@ void PaddleCLR::SetProductActivateCallback(CallbackActivateType functionPtr)
         System::IntPtr(functionPtr),
         PaddleWrapper::PaddleWrapper::CallbackActivateDelegate::typeid);
 
-	wrapperP->paddleRef->activateCallback = callback;
+	i_wrapperP->paddleRef->activateCallback = callback;
 }

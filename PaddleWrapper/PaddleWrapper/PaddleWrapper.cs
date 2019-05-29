@@ -60,7 +60,7 @@ namespace PaddleWrapper
 		public CallbackWithStringDelegate			transactionErrorCallback;
 		public CallbackActivateDelegate				activateCallback;
 
-		void	debug_print(string str)
+		public void		debug_print(string str)
 		{
 			Console.WriteLine(str);
 			Debug.WriteLine(str);
@@ -88,20 +88,11 @@ namespace PaddleWrapper
 
 		public void AddProduct(PaddleProductID prodID, string nameStr, string localizedTrialStr)
 		{
-			debug_print(String.Format(
-				"about to add product: {0}: {1}", 
-				prodID, nameStr));
-			
 			i_prodMap[prodID] = new PaddleProductRec(nameStr, localizedTrialStr);
-
-			debug_print("added");
 		}
 
 		public PaddleProductRec		GetProduct(PaddleProductID prodID)
 		{
-			debug_print(String.Format(
-				"about to find product: {0}", prodID));
-
 			if	(i_prodMap.ContainsKey(prodID)) {
 				return i_prodMap[prodID];
 			}
@@ -145,9 +136,6 @@ namespace PaddleWrapper
 
 		public void		CreateInstance(PaddleProductID productID)
 		{
-			debug_print(String.Format(
-				"about to create instance: {0}", productID));
-
 			string		vendorStr	= i_vendorID.ToString();
 			string		productStr	= productID.ToString();
 

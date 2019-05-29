@@ -11,7 +11,7 @@ class PaddleWrapperPrivate;
 
 class DllExport PaddleCLR
 {
-	PaddleWrapperPrivate	*wrapperP;
+	PaddleWrapperPrivate	*i_wrapperP;
 
 public:
 	typedef int		PaddleProductID;
@@ -32,6 +32,8 @@ public:
 
 	void	AddProduct(PaddleProductID prodID, const char *nameStr, const char *localizedTrialStr);
 	void	CreateInstance(PaddleProductID productID);
+
+	void	debug_print(const char *str);
 
 	void ShowCheckoutWindow(PaddleProductID productId);
 	void ShowProductAccessWindow(PaddleProductID productId);

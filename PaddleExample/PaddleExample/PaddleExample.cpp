@@ -2,6 +2,7 @@
 //
 
 #include "stdafx.h"
+#include <assert.h>
 #include "PaddleExample.h"
 #include "PaddleCLR.h"
 #include <exception>
@@ -169,21 +170,22 @@ void __stdcall productActivateCallback(int stateCode, const char* stateString)
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   hInst = hInstance; // Store instance handle in our global variable
+	hInst = hInstance; // Store instance handle in our global variable
 
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+	HWND	hWnd = CreateWindowW(
+		szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, 
+		nullptr, nullptr, hInstance, nullptr);
 
-   if (!hWnd)
-   {
-      return FALSE;
-   }
+	if (!hWnd) {
+		return FALSE;
+	}
 
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
+	ShowWindow(hWnd, nCmdShow);
+	UpdateWindow(hWnd);
 
-   // Relevant example code starts here: 
-   auto  paddle = PaddleCLR::PaddleCLR(
+	// Relevant example code starts here: 
+	PaddleCLR	paddle(
 		PAD_VENDOR_ID, 
 		PAD_VENDOR_NAME,
 		PAD_VENDOR_AUTH,
@@ -196,15 +198,14 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	paddle.CreateInstance(PAD_PRODUCT_ID);
 
-   paddle.SetBeginTransactionCallback(beginTransactionCallback);
-   paddle.SetTransactionCompleteCallback(transactionCompleteCallback);
-   paddle.SetTransactionErrorCallback(transactionErrorCallback);
-   paddle.SetProductActivateCallback(productActivateCallback);
-   paddle.ShowCheckoutWindow(PAD_PRODUCT_ID);
+	paddle.SetBeginTransactionCallback(beginTransactionCallback);
+	paddle.SetTransactionCompleteCallback(transactionCompleteCallback);
+	paddle.SetTransactionErrorCallback(transactionErrorCallback);
+	paddle.SetProductActivateCallback(productActivateCallback);
+	paddle.ShowCheckoutWindow(PAD_PRODUCT_ID);
 
-   OutputDebugStringA("Checkout complete\n");
-
-   return TRUE;
+	OutputDebugStringA("Checkout complete\n");
+	return TRUE;
 }
 
 
