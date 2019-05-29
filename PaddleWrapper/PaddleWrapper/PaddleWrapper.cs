@@ -162,7 +162,7 @@ namespace PaddleWrapper
 			Paddle.Instance.LicensingCompleteEvent	 += Paddle_LicensingCompleteEvent;
 
 			//	delegate?
-			//	canForceExit = false
+			//	canForceExit = false is done in product? why ?
 		}
 
 		public string					Validate(string jsonCmd)
