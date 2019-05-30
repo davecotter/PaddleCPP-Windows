@@ -229,7 +229,13 @@ namespace PaddleWrapper
 
             product.VerifyActivation((VerificationState state, string s) =>
             {
-                // Not sure what JSON key to give this, if any
+                var stringArr = new JArray { s };
+
+                JObject jsonObject = new JObject
+                {
+                    { kPaddleCmdKey_RETURNVAL, Convert.ToInt32(state) },
+                    { kPaddleCmdKey_ERRORS_ARRAY, stringArr }
+                };
                 t.TrySetResult(state.ToString());
             });
 
