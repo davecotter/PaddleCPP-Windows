@@ -176,16 +176,16 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	paddle.CreateInstance(PAD_PRODUCT_ID);
 
-	//	 validate test 
-	{
-		rapidjson::Document						validateCmd;
-		rapidjson::Document::AllocatorType&		allocator = validateCmd.GetAllocator();
+	//	Validate: 
+	if (0) {
+		rapidjson::Document						cmd; cmd.SetObject();
+		rapidjson::Document::AllocatorType&		allocator = cmd.GetAllocator();
 
-		validateCmd.SetObject();
-		validateCmd.AddMember(kPaddleCmdKey_SKU, PAD_PRODUCT_ID, allocator);
+		cmd.AddMember(kPaddleCmdKey_SKU, PAD_PRODUCT_ID, allocator);
 		
-		std::string		resultStr = paddle.Validate(JSON_ConvertToString(validateCmd));
+		std::string		resultStr = paddle.Validate(JSON_ConvertToString(cmd));
 
+		OutputDebugStringA("validate response: ");
 		OutputDebugStringA(resultStr.c_str());
 	}
 
@@ -195,13 +195,23 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	//	kPaddleCmdKey_SERIAL_NUMBER
 
 	//	Purchase:
-	//	kPaddleCmdKey_SKU
-	//	kPaddleCmdKey_EMAIL
-	//	kPaddleCmdKey_COUPON
-	//	kPaddleCmdKey_COUNTRY
-	//	kPaddleCmdKey_POSTCODE
-	//	kPaddleCmdKey_TITLE
-	//	kPaddleCmdKey_MESSAGE
+	if (1) {
+		rapidjson::Document						cmd; cmd.SetObject();
+		rapidjson::Document::AllocatorType&		allocator = cmd.GetAllocator();
+
+		cmd.AddMember(kPaddleCmdKey_SKU,		PAD_PRODUCT_ID,		allocator);
+		cmd.AddMember(kPaddleCmdKey_EMAIL,		"test@email.com",	allocator);
+		cmd.AddMember(kPaddleCmdKey_COUPON,		"fake-coupon",		allocator);
+		cmd.AddMember(kPaddleCmdKey_COUNTRY,	"US",				allocator);
+		cmd.AddMember(kPaddleCmdKey_POSTCODE,	"94602",			allocator);
+		cmd.AddMember(kPaddleCmdKey_TITLE,		"Catnip",			allocator);
+		cmd.AddMember(kPaddleCmdKey_MESSAGE,	"For fluffy cats",	allocator);
+
+		std::string		resultStr = paddle.Purchase(JSON_ConvertToString(cmd));
+
+		OutputDebugStringA("Purchase response:");
+		OutputDebugStringA(resultStr.c_str());
+	}
 
 	//	Deactivate:
 	//	kPaddleCmdKey_SKU
@@ -209,20 +219,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	//	RecoverLicense:
 	//	kPaddleCmdKey_SKU
 	//	kPaddleCmdKey_EMAIL
-
-	{
-		rapidjson::Document						purchaseCmd;
-		rapidjson::Document::AllocatorType&		allocator = purchaseCmd.GetAllocator();
-
-        purchaseCmd.SetObject();
-        purchaseCmd.AddMember(kPaddleCmdKey_SKU, PAD_PRODUCT_ID, allocator);
-		
-		auto resultStr = paddle.Purchase(JSON_ConvertToString(purchaseCmd));
-
-        OutputDebugStringA("Purchase response: ");
-		OutputDebugStringA(resultStr.c_str());
-	}
-
 
 	OutputDebugStringA("Checkout complete\n");
 	return TRUE;
