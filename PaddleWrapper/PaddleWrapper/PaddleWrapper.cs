@@ -245,25 +245,29 @@ namespace PaddleWrapper
 
 		public string					Purchase(string jsonCmd)
 		{
-			string jsonResult = "";
+			string							jsonResult	= "";
+			Dictionary<string, object>		dict		= new Dictionary<string, object>();
+            JObject							cmdObject	= JObject.Parse(jsonCmd);
+            PaddleProductID					prodID		= cmdObject.Value<PaddleProductID>(kPaddleCmdKey_SKU);
+          
+			string	emailStr     = cmdObject.Value<string>(kPaddleCmdKey_EMAIL);
+			string	couponStr    = cmdObject.Value<string>(kPaddleCmdKey_COUPON);
+			string	countryStr   = cmdObject.Value<string>(kPaddleCmdKey_COUNTRY);
+			string	postStr      = cmdObject.Value<string>(kPaddleCmdKey_POSTCODE);
+			string	titleStr     = cmdObject.Value<string>(kPaddleCmdKey_TITLE);
+			string	messageStr   = cmdObject.Value<string>(kPaddleCmdKey_MESSAGE);
 
-            JObject cmdObject = JObject.Parse(jsonCmd);
-
-            PaddleProductID prodID = cmdObject.Value<PaddleProductID>(kPaddleCmdKey_SKU);
-            string emailStr     = cmdObject.Value<string>(kPaddleCmdKey_EMAIL);
-            string couponStr    = cmdObject.Value<string>(kPaddleCmdKey_COUPON);
-            string countryStr   = cmdObject.Value<string>(kPaddleCmdKey_COUNTRY);
-            string postStr      = cmdObject.Value<string>(kPaddleCmdKey_POSTCODE);
-            // The following do not seem to be available in the Windows SDK:
-            string titleStr     = cmdObject.Value<string>(kPaddleCmdKey_TITLE);
-            string messageStr   = cmdObject.Value<string>(kPaddleCmdKey_MESSAGE);
+			dict.Add("allowQuantity",	false);
+			dict.Add("title",			titleStr);
+			dict.Add("message",			messageStr);
 
             CheckoutOptions checkoutOptions = new CheckoutOptions
             {
                 Email = emailStr,
                 Coupon = couponStr,
                 Country = countryStr,
-                PostCode = postStr
+                PostCode = postStr,
+				Parameters = dict
             };
 
             jsonResult = ShowCheckoutWindowAsync(prodID, checkoutOptions).Result;
