@@ -5,6 +5,9 @@
 AppWizard has created this PaddleExample2008 application for you.
 blaa blaa blaa
 
+you must also have vs2010 installed, since that has the required 
+	platform toolset
+
 Open PaddleExample in vs2017
 buid the entire x86 / debug version
 you may now exit vs2017

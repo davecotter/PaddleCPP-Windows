@@ -15,7 +15,7 @@
 #define MAX_LOADSTRING 100
 
 
-#if __has_include("PaddleCredentials.h")        // Requires VS2015 Update 2 and above
+#if 0	//	__has_include("PaddleCredentials.h")        // Requires VS2015 Update 2 and above
  #include	"PaddleCredentials.h"
 #else
 /**
@@ -48,10 +48,11 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+int WINAPI wWinMain(
+	__in HINSTANCE hInstance,
+	__in_opt HINSTANCE hPrevInstance,
+	__in LPWSTR    lpCmdLine,
+	__in int       nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
@@ -74,7 +75,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     MSG msg;
 
     // Main message loop:
-    while (GetMessage(&msg, nullptr, 0, 0))
+    while (GetMessage(&msg, NULL, 0, 0))
     {
         if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
         {
@@ -105,7 +106,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.cbWndExtra     = 0;
     wcex.hInstance      = hInstance;
     wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_PADDLEEXAMPLE));
-    wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
+    wcex.hCursor        = LoadCursor(NULL, IDC_ARROW);
     wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
     wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_PADDLEEXAMPLE);
     wcex.lpszClassName  = szWindowClass;
@@ -155,9 +156,12 @@ void __stdcall transactionErrorCallback(const char* error)
 
 void __stdcall productActivateCallback(int stateCode, const char* stateString)
 {
-    OutputDebugStringA("productActivateCallback\n");
-    OutputDebugStringA(std::to_string(stateCode).c_str());
-    OutputDebugStringA(stateString);
+	char		bufAC[16];
+
+	_itoa_s(stateCode, bufAC, sizeof(bufAC), 10);
+	OutputDebugStringA("productActivateCallback\n");
+	OutputDebugStringA(bufAC);
+	OutputDebugStringA(stateString);
 }
 
 static std::string		JSON_ConvertToString(rapidjson::Document& doc)
@@ -196,7 +200,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	HWND	hWnd = CreateWindowW(
 		szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, 
-		nullptr, nullptr, hInstance, nullptr);
+		NULL, NULL, hInstance, NULL);
 
 	if (!hWnd) {
 		return FALSE;

@@ -13,6 +13,8 @@ CALL :copy_file %SRC_PATH%,PaddleWrapper.pdb,%TargetDir%
 set PADDLECLR_PATH=%SolutionDir%..\PaddleCLR\PaddleCLR\%TARG_CONFIG%
 CALL :copy_file %PADDLECLR_PATH%,PaddleCLR.pdb,%TargetDir%
 
+REM if debug, copy msvcp90d and msvcr90d from C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\redist\Debug_NonRedist\x86\Microsoft.VC90.DebugCRT
+
 EXIT /B %ERRORLEVEL%
 
 :copy_file

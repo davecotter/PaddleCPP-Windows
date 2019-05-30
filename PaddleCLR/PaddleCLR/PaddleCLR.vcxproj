@@ -30,14 +30,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v90</PlatformToolset>
     <CLRSupport>true</CLRSupport>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v90</PlatformToolset>
     <CLRSupport>true</CLRSupport>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -103,9 +103,8 @@
       <AdditionalUsingDirectories>$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration);%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper;$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -118,9 +117,9 @@
       <AdditionalUsingDirectories>$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration);%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper;$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -132,9 +131,8 @@
       <AdditionalUsingDirectories>$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration);%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper;$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -146,9 +144,8 @@
       <AdditionalUsingDirectories>$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration);%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>
-      </AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper;$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

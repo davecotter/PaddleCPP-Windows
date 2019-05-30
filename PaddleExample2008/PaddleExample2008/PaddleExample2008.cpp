@@ -115,6 +115,52 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	return RegisterClassEx(&wcex);
 }
 
+//---------------------------------------------------------------------------
+
+// Paddle callbacks
+
+void __stdcall beginTransactionCallback()
+{
+	OutputDebugStringA("beginTransactionCallback\n");
+}
+
+void __stdcall transactionCompleteCallback(const char* productID, 
+										   const char* userEmail, 
+										   const char* userCountry, 
+	                                       const char* licenseCode, 
+	                                       const char* orderID, 
+	                                       bool flagged, 
+	                                       const char* processStatusJson)
+{
+	OutputDebugStringA("transactionCompleteCallback:\n");
+	OutputDebugStringA(productID);
+	OutputDebugStringA("\n");
+	OutputDebugStringA(userEmail);
+	OutputDebugStringA("\n");
+	OutputDebugStringA(userCountry);
+	OutputDebugStringA("\n");
+	OutputDebugStringA(licenseCode);
+	OutputDebugStringA("\n");
+	OutputDebugStringA(orderID);
+	OutputDebugStringA("\n");
+	OutputDebugStringA(flagged ? "flagged == true" : "flagged == false");
+	OutputDebugStringA("\n");
+	OutputDebugStringA(processStatusJson);
+}
+
+void __stdcall transactionErrorCallback(const char* error)
+{
+	OutputDebugStringA("transactionErrorCallback\n");
+	OutputDebugStringA(error);
+}
+
+void __stdcall productActivateCallback(int stateCode, const char* stateString)
+{
+    OutputDebugStringA("productActivateCallback\n");
+//    OutputDebugStringA(std::to_string(stateCode).c_str());
+    OutputDebugStringA(stateString);
+}
+
 static std::string		JSON_ConvertToString(rapidjson::Document& doc)
 {
 	rapidjson::StringBuffer								strbuf;
@@ -177,6 +223,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 		OutputDebugStringA(resultStr.c_str());
 	}
+
+	paddle.SetBeginTransactionCallback(beginTransactionCallback);
+	paddle.SetTransactionCompleteCallback(transactionCompleteCallback);
+	paddle.SetTransactionErrorCallback(transactionErrorCallback);
+	paddle.SetProductActivateCallback(productActivateCallback);
+	paddle.ShowCheckoutWindow(PAD_PRODUCT_ID);
 
 	return TRUE;
 }

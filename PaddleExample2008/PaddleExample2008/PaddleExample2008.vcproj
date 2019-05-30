@@ -66,6 +66,11 @@
 				AdditionalLibraryDirectories="&quot;$(SolutionDir)..\PaddleCLR\PaddleCLR\bin\x86\$(ConfigurationName)&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				LargeAddressAware="2"
+				OptimizeReferences="1"
+				EnableCOMDATFolding="0"
+				LinkTimeCodeGeneration="0"
+				DataExecutionPrevention="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -140,8 +145,11 @@
 				AdditionalLibraryDirectories="&quot;$(SolutionDir)..\PaddleCLR\PaddleCLR\bin\x86\$(ConfigurationName)&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
+				LargeAddressAware="2"
+				OptimizeReferences="1"
+				EnableCOMDATFolding="0"
+				LinkTimeCodeGeneration="0"
+				DataExecutionPrevention="1"
 				TargetMachine="1"
 			/>
 			<Tool
