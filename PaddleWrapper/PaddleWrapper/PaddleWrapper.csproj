@@ -77,7 +77,8 @@
       <Lcid>0</Lcid>
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <Private>True</Private>
     </COMReference>
   </ItemGroup>
   <ItemGroup>
@@ -86,6 +87,7 @@
     </PackageReference>
     <PackageReference Include="Paddle.PaddleSDK">
       <Version>2.0.10</Version>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </PackageReference>
     <PackageReference Include="TaskParallelLibrary">
       <Version>1.0.2856</Version>
