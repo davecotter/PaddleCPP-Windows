@@ -276,7 +276,7 @@ namespace PaddleWrapper
 				Parameters = dict
             };
 
-            jsonResult = ShowCheckoutWindowAsync(prodID, checkoutOptions).Result;
+            jsonResult = ShowCheckoutWindowAsync(prodID, checkoutOptions, false, true).Result;
 
             return jsonResult;
         }
@@ -295,7 +295,11 @@ namespace PaddleWrapper
 			return jsonResult;
 		}
 
-        public Task<string> ShowCheckoutWindowAsync(PaddleProductID productID, CheckoutOptions options = null, bool showInBrowser = false, bool isDialog = true)
+        public Task<string> ShowCheckoutWindowAsync(
+			PaddleProductID productID, 
+			CheckoutOptions options,// = null, 
+			bool showInBrowser,// = false, 
+			bool isDialog)// = true)
         {
             i_checkoutOptions = options;
             i_openInBrowser = showInBrowser;
@@ -338,19 +342,29 @@ namespace PaddleWrapper
 
 
 
-        private static void ShowCheckoutWindow(PaddleProduct product, CheckoutOptions options = null, bool showInBrowser = false, bool isDialog = true)
+        private static void ShowCheckoutWindow(
+			PaddleProduct product, 
+			CheckoutOptions options,// = null, 
+			bool showInBrowser,// = false, 
+			bool isDialog)// = true)
 		{
 			Paddle.Instance.ShowCheckoutWindowForProduct(product, options, showInBrowser, isDialog);
 		}
 
-		private static void ShowProductAccessWindow(PaddleProduct product, ProductWindowConfig config = null, bool isDialog = true)
+		private static void ShowProductAccessWindow(
+			PaddleProduct product, 
+			ProductWindowConfig config,// = null, 
+			bool isDialog)// = true)
 		{
-			Paddle.Instance.ShowProductAccessWindowForProduct(product);
+			Paddle.Instance.ShowProductAccessWindowForProduct(product,  config, isDialog);
 		}
 
-		private static void ShowLicenseActivationWindow(PaddleProduct product, LicenseWindowConfig config = null, bool isDialog = true)
+		private static void ShowLicenseActivationWindow(
+			PaddleProduct product, 
+			LicenseWindowConfig config,// = null, 
+			bool isDialog)// = true)
 		{
-			Paddle.Instance.ShowLicenseActivationWindowForProduct(product);
+			Paddle.Instance.ShowLicenseActivationWindowForProduct(product, config, isDialog);
 		}
 
 		//-------------------------------------------------------------------
@@ -412,14 +426,14 @@ namespace PaddleWrapper
 
 			product.ActivateWithEmail(email, license, (VerificationState state, string s) =>
 			{
-				activateCallback?.Invoke(Convert.ToInt32(state), s);
+				if (activateCallback != null) activateCallback.Invoke(Convert.ToInt32(state), s);
 			});
 		}
 
 
 		private void Paddle_TransactionBeginEvent(object sender, TransactionBeginEventArgs e)
 		{
-			beginTransactionCallback?.Invoke();
+			if (beginTransactionCallback != null) beginTransactionCallback.Invoke();
 
 			Debug.WriteLine("Paddle_TransactionBeginEvent");
 			Debug.WriteLine(e.ToString());
@@ -430,7 +444,7 @@ namespace PaddleWrapper
 
 			string processStatusJson = JsonConvert.SerializeObject(e.ProcessStatus, Formatting.Indented);
 
-			transactionCompleteCallback?.Invoke(
+			if (transactionCompleteCallback != null) transactionCompleteCallback.Invoke(
 				e.ProductID,
 				e.UserEmail,
 				e.UserCountry,
@@ -447,7 +461,7 @@ namespace PaddleWrapper
 
 		private void Paddle_TransactionErrorEvent(object sender, TransactionErrorEventArgs e)
 		{
-			transactionErrorCallback?.Invoke(e.Error);
+			if (transactionErrorCallback != null) transactionErrorCallback.Invoke(e.Error);
 
 			Debug.WriteLine("Paddle_TransactionErrorEvent");
 			Debug.WriteLine(e.ToString());
