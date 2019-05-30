@@ -107,6 +107,11 @@ void PaddleCLR::ShowCheckoutWindow(PaddleProductID productId)
 	i_wrapperP->paddleRef->ShowPaddleWindow(productId, PaddleCLR::Checkout);
 }
 
+void PaddleCLR::ShowCheckoutWindowSync(PaddleProductID productId)
+{
+	i_wrapperP->paddleRef->ShowPaddleWindow(productId, PaddleCLR::Checkout);
+}
+
 void PaddleCLR::ShowProductAccessWindow(PaddleProductID productId)
 {
 	i_wrapperP->paddleRef->ShowPaddleWindow(productId, PaddleCLR::ProductAccess);
@@ -149,10 +154,10 @@ void PaddleCLR::SetTransactionErrorCallback(CallbackWithStringType functionPtr)
 
 void PaddleCLR::SetProductActivateCallback(CallbackActivateType functionPtr)
 {
-	PaddleWrapper::PaddleWrapper::CallbackActivateDelegate^ callback = 
-		(PaddleWrapper::PaddleWrapper::CallbackActivateDelegate^) Marshal::GetDelegateForFunctionPointer(
+	PaddleWrapper::PaddleWrapper::CallbackVerificationDelegate^ callback = 
+		(PaddleWrapper::PaddleWrapper::CallbackVerificationDelegate^) Marshal::GetDelegateForFunctionPointer(
 			System::IntPtr(functionPtr),
-			PaddleWrapper::PaddleWrapper::CallbackActivateDelegate::typeid);
+			PaddleWrapper::PaddleWrapper::CallbackVerificationDelegate::typeid);
 
 	i_wrapperP->paddleRef->activateCallback = callback;
 }

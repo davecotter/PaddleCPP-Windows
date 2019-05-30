@@ -15,7 +15,7 @@
 #define MAX_LOADSTRING 100
 
 
-#if 0	//	__has_include("PaddleCredentials.h")        // Requires VS2015 Update 2 and above
+#if	__has_include("PaddleCredentials.h")        // Requires VS2015 Update 2 and above
  #include	"PaddleCredentials.h"
 #else
 /**
@@ -223,7 +223,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	paddle.CreateInstance(PAD_PRODUCT_ID);
 
-	//	 validate test
+	//	 validate test 
 	{
 		rapidjson::Document						validateCmd;
 		rapidjson::Document::AllocatorType&		allocator = validateCmd.GetAllocator();
@@ -261,7 +261,20 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	paddle.SetTransactionCompleteCallback(transactionCompleteCallback);
 	paddle.SetTransactionErrorCallback(transactionErrorCallback);
 	paddle.SetProductActivateCallback(productActivateCallback);
-	paddle.ShowCheckoutWindow(PAD_PRODUCT_ID);
+
+	{
+		rapidjson::Document						purchaseCmd;
+		rapidjson::Document::AllocatorType&		allocator = purchaseCmd.GetAllocator();
+
+        purchaseCmd.SetObject();
+        purchaseCmd.AddMember(kPaddleCmdKey_SKU, PAD_PRODUCT_ID, allocator);
+		
+		auto resultStr = paddle.Purchase(JSON_ConvertToString(purchaseCmd));
+
+        OutputDebugStringA("Purchase response: ");
+		OutputDebugStringA(resultStr.c_str());
+	}
+
 
 	OutputDebugStringA("Checkout complete\n");
 	return TRUE;

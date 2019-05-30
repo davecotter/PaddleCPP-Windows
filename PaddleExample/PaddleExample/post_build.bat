@@ -2,7 +2,7 @@ set SolutionDir=%1
 set TARG_CONFIG=%2
 set TargetDir=%3
 
-set FILE_LIST=(PaddleSDK StructureMap RGiesecke.DllExport.Metadata Newtonsoft.Json Interop.SHDocVw CredentialManagement)
+set FILE_LIST=(PaddleSDK StructureMap Newtonsoft.Json Interop.SHDocVw CredentialManagement System.Threading)
 set SRC_PATH=%SolutionDir%..\PaddleWrapper\PaddleWrapper\%TARG_CONFIG%
 for %%i in %FILE_LIST% do (
 	CALL :copy_file %SRC_PATH%,%%i.dll,%TargetDir%
