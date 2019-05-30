@@ -448,6 +448,16 @@ namespace PaddleWrapper
 			Debug.WriteLine("Paddle_TransactionErrorEvent");
 			Debug.WriteLine(e.ToString());
 
+            var stringArr = new JArray { e.Error };
+
+            JObject errorObject = new JObject
+            {
+                { kPaddleCmdKey_ERRORS_ARRAY }
+            }
+			string processStatusJson = JsonConvert.SerializeObject(, Formatting.Indented);
+
+            currentTaskCompletionSource.TrySetResult();
+
 		}
 
 		private void Paddle_LicensingCompleteEvent(object sender, LicensingCompleteEventArgs e)
