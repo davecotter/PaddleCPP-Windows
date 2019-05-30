@@ -201,29 +201,28 @@ namespace PaddleWrapper
 				productStr, 
 				Paddle_GetConfig(productID));
 
-			Paddle.Instance.TransactionBeginEvent	 += Paddle_TransactionBeginEvent;
-			Paddle.Instance.TransactionCompleteEvent += Paddle_TransactionCompleteEvent;
-			Paddle.Instance.TransactionErrorEvent	 += Paddle_TransactionErrorEvent;
-			Paddle.Instance.LicensingCompleteEvent	 += Paddle_LicensingCompleteEvent;
+			Paddle.Instance.TransactionBeginEvent		+= Paddle_TransactionBeginEvent;
+			Paddle.Instance.TransactionCompleteEvent	+= Paddle_TransactionCompleteEvent;
+			Paddle.Instance.TransactionErrorEvent		+= Paddle_TransactionErrorEvent;
 
-			//	delegate?
-			//	canForceExit = false is done in product? why ?
+			Paddle.Instance.LicensingStarting			+= Paddle_LicensingBeginEvent;
+			Paddle.Instance.LicensingCompleteEvent		+= Paddle_LicensingCompleteEvent;
+			Paddle.Instance.LicensingErrorEvent			+= Paddle_LicensingErrorEvent;
 		}
 
 		public string					Validate(string jsonCmd)
 		{
-            string jsonResult = "";
-            JObject cmdObject = JObject.Parse(jsonCmd);
-            PaddleProductID prodID = cmdObject.Value<PaddleProductID>(kPaddleCmdKey_SKU);
+            string				jsonResult	= "";
+            JObject				cmdObject	= JObject.Parse(jsonCmd);
+            PaddleProductID		prodID		= cmdObject.Value<PaddleProductID>(kPaddleCmdKey_SKU);
+            PaddleProduct		product		= Paddle_GetProduct(prodID);
 
-            PaddleProduct product = Paddle_GetProduct(prodID);
-
-            jsonResult = ValidateAsync(product).Result;
+            jsonResult = ValidateAsync(product);
 
             return jsonResult;
 		}
 
-        private Task<string> ValidateAsync(PaddleProduct product)
+        private string ValidateAsync(PaddleProduct product)
         {
             var t = new TaskCompletionSource<string>();
 
@@ -236,10 +235,11 @@ namespace PaddleWrapper
                     { kPaddleCmdKey_RETURNVAL, Convert.ToInt32(state) },
                     { kPaddleCmdKey_ERRORS_ARRAY, stringArr }
                 };
-                t.TrySetResult(state.ToString());
+
+				t.TrySetResult(jsonObject.ToString());
             });
 
-            return t.Task;
+            return t.Task.Result;
         }
 
 		public string					Activate(string jsonCmd)
@@ -252,7 +252,6 @@ namespace PaddleWrapper
 		public string					Purchase(string jsonCmd)
 		{
 			string							jsonResult	= "";
-			Dictionary<string, object>		dict		= new Dictionary<string, object>();
             JObject							cmdObject	= JObject.Parse(jsonCmd);
             PaddleProductID					prodID		= cmdObject.Value<PaddleProductID>(kPaddleCmdKey_SKU);
           
@@ -263,20 +262,20 @@ namespace PaddleWrapper
 			string	titleStr     = cmdObject.Value<string>(kPaddleCmdKey_TITLE);
 			string	messageStr   = cmdObject.Value<string>(kPaddleCmdKey_MESSAGE);
 
-			dict.Add("allowQuantity",	false);
-			dict.Add("title",			titleStr);
-			dict.Add("message",			messageStr);
-
-            CheckoutOptions checkoutOptions = new CheckoutOptions
-            {
-                Email = emailStr,
-                Coupon = couponStr,
-                Country = countryStr,
-                PostCode = postStr,
-				Parameters = dict
+            CheckoutOptions checkoutOptions = new CheckoutOptions {
+                Email		= emailStr,
+                Coupon		= couponStr,
+                Country		= countryStr,
+                PostCode	= postStr
             };
 
-            jsonResult = ShowCheckoutWindowAsync(prodID, checkoutOptions, false, true).Result;
+			//	custom param keys are documented here: https://paddle.com/docs/api-custom-checkout/
+			checkoutOptions.AddCheckoutParameters("quantity_variable",	0);
+			checkoutOptions.AddCheckoutParameters("title",				titleStr);
+			checkoutOptions.AddCheckoutParameters("custom_message",		messageStr);
+
+			//	documented here: https://paddle.com/docs/checkout-options-windows-sdk/
+            jsonResult = ShowCheckoutWindowAsync(prodID, checkoutOptions, false, true);
 
             return jsonResult;
         }
@@ -295,18 +294,21 @@ namespace PaddleWrapper
 			return jsonResult;
 		}
 
-        public Task<string> ShowCheckoutWindowAsync(
+        public	string		ShowCheckoutWindowAsync(
 			PaddleProductID productID, 
 			CheckoutOptions options,// = null, 
 			bool showInBrowser,// = false, 
 			bool isDialog)// = true)
         {
-            i_checkoutOptions = options;
-            i_openInBrowser = showInBrowser;
-            i_isDialog = isDialog;
+            i_checkoutOptions	= options;
+            i_openInBrowser		= showInBrowser;
+            i_isDialog			= isDialog;
+
             currentTaskCompletionSource = new TaskCompletionSource<string>();
+
             ShowPaddleWindow(productID, (int) PaddleWindowType.Checkout);
-            return currentTaskCompletionSource.Task;
+
+            return currentTaskCompletionSource.Task.Result;
         }
 
         // TODO Make this private and wrap other windows as above
@@ -415,10 +417,6 @@ namespace PaddleWrapper
 
 		//-------------------------------------------------------------------
 
-		public void Validate()
-		{
-		}
-
 		public void Activate(string productId, string email, string license)
 		{
 			// Initialize the Product you'd like to work with
@@ -474,12 +472,22 @@ namespace PaddleWrapper
             };
 
             currentTaskCompletionSource.TrySetResult(errorObject.ToString());
+		}
 
+		private void Paddle_LicensingBeginEvent(object sender, LicensingStartingEventArgs e)
+		{
+			// TODO
 		}
 
 		private void Paddle_LicensingCompleteEvent(object sender, LicensingCompleteEventArgs e)
 		{
-			   // TODO
+			// TODO
 		}
+
+		private void Paddle_LicensingErrorEvent(object sender, LicensingErrorEventArgs e)
+		{
+			// TODO
+		}
+	
 	}
 }
