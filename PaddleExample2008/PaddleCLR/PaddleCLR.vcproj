@@ -2,10 +2,10 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="PaddleExample2008"
-	ProjectGUID="{C88CDDB9-FA45-45BF-A409-3CEA39B302EC}"
-	RootNamespace="PaddleExample2008"
-	Keyword="Win32Proj"
+	Name="PaddleCLR"
+	ProjectGUID="{0C4C1C2A-F9C1-43C8-8316-5B1FD299B63A}"
+	RootNamespace="PaddleCLR"
+	Keyword="ManagedCProj"
 	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
@@ -20,8 +20,9 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			CharacterSet="1"
+			ManagedExtensions="1"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -41,14 +42,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\PaddleCLR\PaddleCLR&quot;;&quot;$(SolutionDir)..\PaddleExample\PaddleExample\rapidjson&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
+				AdditionalIncludeDirectories="$(SolutionDir)..\PaddleCLR\PaddleCLR"
+				AdditionalUsingDirectories="&quot;$(SolutionDir)$(ConfigurationName)&quot;"
+				PreprocessorDefinitions="WIN32;_DEBUG"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -61,16 +61,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PaddleCLR.lib"
+				AdditionalDependencies="$(NoInherit)"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)$(ConfigurationName)&quot;"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)$(ConfigurationName)\&quot;;&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\Lib\um\x86&quot;"
 				GenerateDebugInformation="true"
-				SubSystem="2"
-				LargeAddressAware="2"
-				OptimizeReferences="1"
-				EnableCOMDATFolding="0"
-				LinkTimeCodeGeneration="0"
-				DataExecutionPrevention="1"
+				AssemblyDebug="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -99,8 +94,9 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			CharacterSet="1"
+			ManagedExtensions="1"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -120,12 +116,10 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
-				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\PaddleCLR\PaddleCLR&quot;;&quot;$(SolutionDir)..\PaddleExample\PaddleExample\rapidjson&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
+				AdditionalIncludeDirectories="$(SolutionDir)..\PaddleCLR\PaddleCLR"
+				AdditionalUsingDirectories="&quot;$(SolutionDir)$(ConfigurationName)&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG"
 				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -141,16 +135,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PaddleCLR.lib"
+				AdditionalDependencies="$(NoInherit)"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)$(ConfigurationName)&quot;"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)$(ConfigurationName)\&quot;;&quot;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\Lib\um\x86&quot;"
 				GenerateDebugInformation="true"
-				SubSystem="2"
-				LargeAddressAware="2"
-				OptimizeReferences="1"
-				EnableCOMDATFolding="0"
-				LinkTimeCodeGeneration="0"
-				DataExecutionPrevention="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -177,6 +165,21 @@
 		</Configuration>
 	</Configurations>
 	<References>
+		<AssemblyReference
+			RelativePath="System.dll"
+			AssemblyName="System, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL"
+			MinFrameworkVersion="131072"
+		/>
+		<AssemblyReference
+			RelativePath="System.Data.dll"
+			AssemblyName="System.Data, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=x86"
+			MinFrameworkVersion="131072"
+		/>
+		<AssemblyReference
+			RelativePath="System.XML.dll"
+			AssemblyName="System.Xml, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL"
+			MinFrameworkVersion="131072"
+		/>
 	</References>
 	<Files>
 		<Filter
@@ -185,11 +188,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\PaddleExample2008.cpp"
+				RelativePath=".\AssemblyInfo.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\stdafx.cpp"
+				RelativePath="..\..\PaddleCLR\PaddleCLR\PaddleCLR.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Stdafx.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -215,19 +222,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\PaddleExample2008.h"
+				RelativePath="..\..\PaddleCLR\PaddleCLR\PaddleCLR.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Resource.h"
+				RelativePath=".\resource.h"
 				>
 			</File>
 			<File
-				RelativePath=".\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\targetver.h"
+				RelativePath=".\Stdafx.h"
 				>
 			</File>
 		</Filter>
@@ -237,15 +240,11 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\PaddleExample2008.ico"
+				RelativePath=".\app.ico"
 				>
 			</File>
 			<File
-				RelativePath=".\PaddleExample2008.rc"
-				>
-			</File>
-			<File
-				RelativePath=".\small.ico"
+				RelativePath=".\app.rc"
 				>
 			</File>
 		</Filter>
