@@ -222,9 +222,10 @@ namespace PaddleWrapper
             return jsonResult;
 		}
 
+		static string s_asyncStr;
         private string ValidateAsync(PaddleProduct product)
         {
-            var t = new TaskCompletionSource<string>();
+           // var t = new TaskCompletionSource<string>();
 
             product.VerifyActivation((VerificationState state, string s) =>
             {
@@ -236,10 +237,19 @@ namespace PaddleWrapper
                     { kPaddleCmdKey_ERRORS_ARRAY, stringArr }
                 };
 
-				t.TrySetResult(jsonObject.ToString());
+				//t.TrySetResult(jsonObject.ToString());
+
+				s_asyncStr = jsonObject.ToString();
             });
 
-            return t.Task.Result;
+			while (string.IsNullOrEmpty(s_asyncStr))
+			{
+				Application.DoEvents();
+			}
+
+			return s_asyncStr;
+
+//            return t.Task.Result;
         }
 
 		public string					Activate(string jsonCmd)
@@ -270,7 +280,7 @@ namespace PaddleWrapper
             };
 
 			//	custom param keys are documented here: https://paddle.com/docs/api-custom-checkout/
-			checkoutOptions.AddCheckoutParameters("quantity_variable",	0);
+			checkoutOptions.AddCheckoutParameters("quantity_variable",	"0");
 			checkoutOptions.AddCheckoutParameters("title",				titleStr);
 			checkoutOptions.AddCheckoutParameters("custom_message",		messageStr);
 
@@ -308,7 +318,9 @@ namespace PaddleWrapper
 
             ShowPaddleWindow(productID, (int) PaddleWindowType.Checkout);
 
-            return currentTaskCompletionSource.Task.Result;
+			string resultStr = currentTaskCompletionSource.Task.Result;
+           
+			return resultStr;
         }
 
         // TODO Make this private and wrap other windows as above
