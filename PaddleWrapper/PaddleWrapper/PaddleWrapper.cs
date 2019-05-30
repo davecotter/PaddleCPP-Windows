@@ -453,10 +453,9 @@ namespace PaddleWrapper
             JObject errorObject = new JObject
             {
                 { kPaddleCmdKey_ERRORS_ARRAY }
-            }
-			string processStatusJson = JsonConvert.SerializeObject(, Formatting.Indented);
+            };
 
-            currentTaskCompletionSource.TrySetResult();
+            currentTaskCompletionSource.TrySetResult(errorObject.ToString());
 
 		}
 
