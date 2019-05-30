@@ -90,9 +90,6 @@
     <PackageReference Include="TaskParallelLibrary">
       <Version>1.0.2856</Version>
     </PackageReference>
-    <PackageReference Include="UnmanagedExports">
-      <Version>1.2.7</Version>
-    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.manifest" />
