@@ -229,7 +229,13 @@ namespace PaddleWrapper
 
             product.VerifyActivation((VerificationState state, string s) =>
             {
-                // Not sure what JSON key to give this, if any
+                var stringArr = new JArray { s };
+
+                JObject jsonObject = new JObject
+                {
+                    { kPaddleCmdKey_RETURNVAL, Convert.ToInt32(state) },
+                    { kPaddleCmdKey_ERRORS_ARRAY, stringArr }
+                };
                 t.TrySetResult(state.ToString());
             });
 
@@ -445,6 +451,16 @@ namespace PaddleWrapper
 
 			Debug.WriteLine("Paddle_TransactionErrorEvent");
 			Debug.WriteLine(e.ToString());
+
+            var stringArr = new JArray { e.Error };
+
+            JObject errorObject = new JObject
+            {
+                { kPaddleCmdKey_ERRORS_ARRAY }
+            }
+			string processStatusJson = JsonConvert.SerializeObject(, Formatting.Indented);
+
+            currentTaskCompletionSource.TrySetResult();
 
 		}
 
