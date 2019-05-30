@@ -12,12 +12,18 @@ using PaddleSDK;
 using PaddleSDK.Checkout;
 using PaddleSDK.Product;
 using PaddleSDK.Licensing;
+using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace PaddleWrapper
 {
 	using PaddleProductID = System.Int32;
 
-	public enum PaddleWindowType {
+
+
+
+    public enum PaddleWindowType
+    {
 		ProductAccess,
 		Checkout, 
 		LicenseActivation
@@ -25,21 +31,25 @@ namespace PaddleWrapper
 
 	public class PaddleWrapper
 	{
-		private int		i_vendorID;
+		private int     i_vendorID;
 		private string	i_vendorNameStr;
 		private string	i_vendorAuthStr;
 		private string	i_apiKeyStr;
 
-		private PaddleProduct		i_currentProduct;
-		private PaddleWindowType	i_currentWindowType;
+		private PaddleProduct       i_currentProduct;
+		private PaddleWindowType    i_currentWindowType;
+		private CheckoutOptions     i_checkoutOptions;
 
-		private Thread					thread;
-		private SynchronizationContext	ctx;
-		private ManualResetEvent		mre;
+        private TaskCompletionSource<string> currentTaskCompletionSource;
 
-		public delegate void ShowProductWindowDelegate(PaddleProduct product);
+		private Thread                  thread;
+		private SynchronizationContext  ctx;
+		private ManualResetEvent        threadInitEvent;
+        private AutoResetEvent          callbackEvent;
 
-		ShowProductWindowDelegate		showProductWindowDelegate;
+		public delegate void ShowCheckoutWindowDelegate(PaddleProduct product, CheckoutOptions options, bool openInBrowser, bool isDialog);
+
+		ShowCheckoutWindowDelegate       showProductWindowDelegate;
 
 		// Delegates used for native C++ callback functions
 		public delegate void CallbackDelegate();
@@ -53,14 +63,41 @@ namespace PaddleWrapper
 			bool   flaggedB,
 			string processStatusStr);
 
-		public delegate void CallbackActivateDelegate(int verificationState, string verificationString);
+		public delegate void CallbackVerificationDelegate(int verificationState, string verificationString);
 
-		public CallbackDelegate						beginTransactionCallback;
-		public CallbackTransactionCompleteDelegate	transactionCompleteCallback;
-		public CallbackWithStringDelegate			transactionErrorCallback;
-		public CallbackActivateDelegate				activateCallback;
+		public CallbackDelegate	                    beginTransactionCallback;
+		public CallbackTransactionCompleteDelegate  transactionCompleteCallback;
+		public CallbackWithStringDelegate           transactionErrorCallback;
+		public CallbackVerificationDelegate         activateCallback;
+		public CallbackVerificationDelegate         validateCallback;
 
-		public void		debug_print(string str)
+
+        // Copied from CPaddleInterface 
+        private const string kPaddleCmdKey_SKU              = "SKU";
+        private const string kPaddleCmdKey_SKUSTR           = "SKUstr";   //	product title
+        private const string kPaddleCmdKey_CMD              = "cmd";
+        private const string kPaddleCmdKey_CMDSTR           = "cmdStr";
+
+        private const string kPaddleCmdKey_EMAIL            = "email";
+        private const string kPaddleCmdKey_SERIAL_NUMBER    = "serial number";
+        private const string kPaddleCmdKey_COUNTRY          = "country";
+        private const string kPaddleCmdKey_POSTCODE         = "postcode";
+        private const string kPaddleCmdKey_COUPON           = "coupon";
+        private const string kPaddleCmdKey_OLD_SN           = "old_sn";
+        private const string kPaddleCmdKey_TITLE            = "title";     //	product title
+        private const string kPaddleCmdKey_MESSAGE          = "message"; //	product description
+
+        private const string kPaddleCmdKey_RETURNVAL        = "return val";
+        private const string kPaddleCmdKey_RESULTS          = "results";
+        private const string kPaddleCmdKey_SUCCESS          = "success";
+        private const string kPaddleCmdKey_PURCH_RESPONSE   = "purchase response";
+        private const string kPaddleCmdKey_RESPONSE         = "response";
+        private const string kPaddleCmdKey_CANCEL           = "cancel";
+        private const string kPaddleCmdKey_ERRORS_ARRAY     = "errors array";   //	array of CFError dicts
+        private const string kPaddleCmdKey_TESTING          = "testing";
+
+
+        public void		debug_print(string str)
 		{
 			Console.WriteLine(str);
 			Debug.WriteLine(str);
@@ -133,16 +170,19 @@ namespace PaddleWrapper
 		}
 
 		public PaddleWrapper(
-			int					vendorID,
-			string				vendorNameStr,
-			string				vendorAuthStr,
-			string				apiKeyStr)
+			int                 vendorID,
+			string              vendorNameStr,
+			string              vendorAuthStr,
+			string              apiKeyStr)
 		{
-			i_vendorID		= vendorID;
-			i_vendorNameStr	= vendorNameStr;
-			i_vendorAuthStr	= vendorAuthStr;
-			i_apiKeyStr		= apiKeyStr;
-		}
+			i_vendorID      = vendorID;
+			i_vendorNameStr = vendorNameStr;
+			i_vendorAuthStr = vendorAuthStr;
+			i_apiKeyStr     = apiKeyStr;
+
+            callbackEvent = new AutoResetEvent(false);
+
+        }
 
 		public void		CreateInstance(PaddleProductID productID)
 		{
@@ -167,10 +207,29 @@ namespace PaddleWrapper
 
 		public string					Validate(string jsonCmd)
 		{
-			string		jsonResult = jsonCmd;	//	to test round trip
+            string jsonResult = "";
+            JObject cmdObject = JObject.Parse(jsonCmd);
+            PaddleProductID prodID = (PaddleProductID)cmdObject.GetValue(kPaddleCmdKey_SKU);
 
-			return jsonResult;
+            PaddleProduct product = Paddle_GetProduct(prodID);
+
+            jsonResult = ValidateAsync(product).Result;
+
+            return jsonResult;
 		}
+
+        private Task<string> ValidateAsync(PaddleProduct product)
+        {
+            var t = new TaskCompletionSource<string>();
+
+            product.VerifyActivation((VerificationState state, string s) =>
+            {
+                // Not sure what JSON key to give this, if any
+                t.TrySetResult(state.ToString());
+            });
+
+            return t.Task;
+        }
 
 		public string					Activate(string jsonCmd)
 		{
@@ -181,10 +240,30 @@ namespace PaddleWrapper
 
 		public string					Purchase(string jsonCmd)
 		{
-			string		jsonResult = "";
+			string jsonResult = "";
 
-			return jsonResult;
-		}
+            JObject cmdObject = JObject.Parse(jsonCmd);
+
+            PaddleProductID prodID = (PaddleProductID) cmdObject.GetValue(kPaddleCmdKey_SKU);
+            string emailStr     = cmdObject.GetValue(kPaddleCmdKey_EMAIL).ToString();
+            string couponStr    = cmdObject.GetValue(kPaddleCmdKey_COUPON).ToString();
+            string countryStr   = cmdObject.GetValue(kPaddleCmdKey_COUNTRY).ToString();
+            string postStr      = cmdObject.GetValue(kPaddleCmdKey_POSTCODE).ToString();
+            // The following do not seem to be available in the Windows SDK:
+            string titleStr     = cmdObject.GetValue(kPaddleCmdKey_TITLE).ToString();
+            string messageStr   = cmdObject.GetValue(kPaddleCmdKey_MESSAGE).ToString();
+
+            CheckoutOptions checkoutOptions = new CheckoutOptions();
+
+            checkoutOptions.Email = emailStr;
+            checkoutOptions.Coupon = couponStr;
+            checkoutOptions.Country = countryStr;
+            checkoutOptions.PostCode = postStr;
+
+            jsonResult = ShowCheckoutWindowAsync(product, checkoutOptions).Result;
+
+            return jsonResult;
+        }
 
 		public string					Deactivate(string jsonCmd)
 		{
@@ -200,6 +279,14 @@ namespace PaddleWrapper
 			return jsonResult;
 		}
 
+        public void ShowCheckoutWindowAsync(PaddleProductID productID, CheckoutOptions options = null)
+        {
+            i_checkoutOptions = options;
+            currentTaskCompletionSource = new TaskCompletionSource<string>();
+            ShowPaddleWindow(productID, (int) PaddleWindowType.Checkout);
+        }
+
+        // TODO Make this private and wrap other windows as above
 		public void ShowPaddleWindow(PaddleProductID productID, int windowType)
 		{
 			// Initialize the Product you'd like to work with
@@ -230,9 +317,11 @@ namespace PaddleWrapper
 
 		}
 
-		private static void ShowCheckoutWindow(PaddleProduct product)
+
+
+        private static void ShowCheckoutWindow(PaddleProduct product, CheckoutOptions options = null, bool showInBrowser = false, bool isDialog = true)
 		{
-			Paddle.Instance.ShowCheckoutWindowForProduct(product);
+			Paddle.Instance.ShowCheckoutWindowForProduct(product, options, showInBrowser, isDialog);
 		}
 
 		private static void ShowProductAccessWindow(PaddleProduct product)
@@ -252,7 +341,7 @@ namespace PaddleWrapper
 		private void Initialize(object sender, EventArgs e)
 		{
 			ctx = SynchronizationContext.Current;
-			mre.Set();
+			threadInitEvent.Set();
 			Application.Idle -= Initialize;
 			if (ctx == null) throw new ObjectDisposedException("STAThread");
 			
@@ -277,7 +366,7 @@ namespace PaddleWrapper
 
 		private void StartWindowThread()
 		{
-			using (mre = new ManualResetEvent(false))
+			using (threadInitEvent = new ManualResetEvent(false))
 			{
 				thread = new Thread(() => {
 					Application.Idle += Initialize;
@@ -285,8 +374,9 @@ namespace PaddleWrapper
 				});
 				thread.SetApartmentState(ApartmentState.STA);
 				thread.Start();
-				mre.WaitOne();
+				threadInitEvent.WaitOne();
 			}
+            callbackEvent.WaitOne();
 		}
 
 		//-------------------------------------------------------------------
@@ -306,11 +396,6 @@ namespace PaddleWrapper
 			});
 		}
 
-
-		public void Purchase()
-		{
-			// TODO (?)
-		}
 
 		private void Paddle_TransactionBeginEvent(object sender, TransactionBeginEventArgs e)
 		{
@@ -336,19 +421,25 @@ namespace PaddleWrapper
 
 			Debug.WriteLine("Paddle_TransactionCompleteEvent");
 			Debug.WriteLine(e.ToString());
+
+            currentTaskCompletionSource.TrySetResult(processStatusJson);
+
+            callbackEvent.Set(); // TODO Remove 
 		}
 
 		private void Paddle_TransactionErrorEvent(object sender, TransactionErrorEventArgs e)
 		{
 			transactionErrorCallback?.Invoke(e.Error);
+
 			Debug.WriteLine("Paddle_TransactionErrorEvent");
 			Debug.WriteLine(e.ToString());
+
+            callbackEvent.Set();
 		}
 
 		private void Paddle_LicensingCompleteEvent(object sender, LicensingCompleteEventArgs e)
 		{
 			   // TODO
 		}
-
 	}
 }

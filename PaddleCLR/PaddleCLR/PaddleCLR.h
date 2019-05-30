@@ -44,6 +44,7 @@ public:
 	std::string			RecoverLicense(const std::string& jsonCmd);
 
 	void ShowCheckoutWindow(PaddleProductID productId);
+	void ShowCheckoutWindowSync(PaddleProductID productId);
 	void ShowProductAccessWindow(PaddleProductID productId);
 	void ShowLicenseActivationWindow(PaddleProductID productId);
 
@@ -51,4 +52,7 @@ public:
 	void SetTransactionCompleteCallback(CallbackTransactionCompleteType functionPtr);
 	void SetTransactionErrorCallback(CallbackWithStringType functionPtr);
     void SetProductActivateCallback(CallbackActivateType functionPtr);	
+
+private:
+    bool transactionComplete;
 };

@@ -107,6 +107,11 @@ void PaddleCLR::ShowCheckoutWindow(PaddleProductID productId)
 	i_wrapperP->paddleRef->ShowPaddleWindow(productId, PaddleCLR::Checkout);
 }
 
+void PaddleCLR::ShowCheckoutWindowSync(PaddleProductID productId)
+{
+	i_wrapperP->paddleRef->ShowPaddleWindow(productId, PaddleCLR::Checkout);
+}
+
 void PaddleCLR::ShowProductAccessWindow(PaddleProductID productId)
 {
 	i_wrapperP->paddleRef->ShowPaddleWindow(productId, PaddleCLR::ProductAccess);

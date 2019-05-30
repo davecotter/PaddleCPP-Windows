@@ -15,7 +15,7 @@
 #define MAX_LOADSTRING 100
 
 
-#if 0	//	__has_include("PaddleCredentials.h")        // Requires VS2015 Update 2 and above
+#if	__has_include("PaddleCredentials.h")        // Requires VS2015 Update 2 and above
  #include	"PaddleCredentials.h"
 #else
 /**
