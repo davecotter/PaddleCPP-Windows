@@ -224,7 +224,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	paddle.CreateInstance(PAD_PRODUCT_ID);
 
 	//	 validate test 
-    /*
 	{
 		rapidjson::Document						validateCmd;
 		rapidjson::Document::AllocatorType&		allocator = validateCmd.GetAllocator();
@@ -236,7 +235,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 		OutputDebugStringA(resultStr.c_str());
 	}
-    */
 
 	//	Activate:
 	//	kPaddleCmdKey_SKU
