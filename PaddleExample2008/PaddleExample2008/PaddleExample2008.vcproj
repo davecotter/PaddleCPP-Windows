@@ -41,12 +41,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\PaddleCLR\PaddleCLR&quot;;&quot;$(SolutionDir)..\PaddleExample\PaddleExample\rapidjson&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\PaddleExample\PaddleExample&quot;;&quot;$(SolutionDir)..\PaddleCLR\PaddleCLR&quot;"
+				PreprocessorDefinitions="OPT_2008=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="1"
+				PrecompiledHeaderThrough="stdafx.h"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -55,6 +56,7 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				AdditionalIncludeDirectories="$(SolutionDir)..\PaddleExample\PaddleExample"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -122,11 +124,12 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\PaddleCLR\PaddleCLR&quot;;&quot;$(SolutionDir)..\PaddleExample\PaddleExample\rapidjson&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\PaddleExample\PaddleExample&quot;;&quot;$(SolutionDir)..\PaddleCLR\PaddleCLR&quot;"
+				PreprocessorDefinitions="OPT_2008=1"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="1"
+				PrecompiledHeaderThrough="stdafx.h"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -135,6 +138,7 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				AdditionalIncludeDirectories="$(SolutionDir)..\PaddleExample\PaddleExample"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -185,28 +189,12 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\PaddleExample2008.cpp"
+				RelativePath="..\..\PaddleExample\PaddleExample\PaddleExample.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\stdafx.cpp"
+				RelativePath="..\..\PaddleExample\PaddleExample\stdafx.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter
@@ -215,7 +203,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\PaddleExample2008.h"
+				RelativePath="..\..\PaddleExample\PaddleExample\PaddleExample.h"
 				>
 			</File>
 			<File
@@ -223,11 +211,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\stdafx.h"
+				RelativePath="..\..\PaddleExample\PaddleExample\stdafx.h"
 				>
 			</File>
 			<File
-				RelativePath=".\targetver.h"
+				RelativePath="..\..\PaddleExample\PaddleExample\targetver.h"
 				>
 			</File>
 		</Filter>
