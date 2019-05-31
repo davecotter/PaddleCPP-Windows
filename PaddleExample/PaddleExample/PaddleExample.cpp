@@ -8,30 +8,39 @@
 #include <exception>
 #include <iostream>
 #include <string>
+
 #include "rapidjson/document.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/prettywriter.h"
 
+#define		kTest_Validate		0
+#define		kTest_Purchase		1
+
+#if OPT_2008
+	#define	HAS_INCLUDE		0
+#else
+	#define	HAS_INCLUDE		__has_include("PaddleCredentials.h")        // Requires VS2015 Update 2 and above
+#endif
+
 #define MAX_LOADSTRING 100
 
-
-#if	__has_include("PaddleCredentials.h")        // Requires VS2015 Update 2 and above
- #include	"PaddleCredentials.h"
+#if	HAS_INCLUDE
+	#include	"PaddleCredentials.h"
 #else
-/**
- * Default Paddle credentials
- *
- * Copy and paste into "PaddleCredentials.h" and add your own details 
- * to use your Paddle account
- */
-#define    PAD_VENDOR_ID               11745
-#define    PAD_VENDOR_NAME             "My Company"
-#define    PAD_VENDOR_AUTH             "this is not a real vendor auth string"
-#define    PAD_API_KEY                 "4134242689d26430f89ec0858884ab07"
+	/**
+	 * Default Paddle credentials
+	 *
+	 * Copy and paste into "PaddleCredentials.h" and add your own details 
+	 * to use your Paddle account
+	 */
+	#define    PAD_VENDOR_ID               11745
+	#define    PAD_VENDOR_NAME             "The Catnip Co."
+	#define    PAD_VENDOR_AUTH             "this is not a real vendor auth string"
+	#define    PAD_API_KEY                 "4134242689d26430f89ec0858884ab07"
 
-#define    PAD_PRODUCT_ID              511013
-#define    PAD_PRODUCT_NAME            "MyCoolApp"
-#endif
+	#define    PAD_PRODUCT_ID              511013
+	#define    PAD_PRODUCT_NAME            "Optimum Cats"
+#endif	//	HAS_INCLUDE
 
 //---------------------------------------------------------------------------
 
@@ -177,7 +186,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	paddle.CreateInstance(PAD_PRODUCT_ID);
 
 	//	Validate: 
-	if (0) {
+	if (kTest_Validate) {
 		rapidjson::Document						cmd; cmd.SetObject();
 		rapidjson::Document::AllocatorType&		allocator = cmd.GetAllocator();
 
@@ -195,7 +204,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	//	kPaddleCmdKey_SERIAL_NUMBER
 
 	//	Purchase:
-	if (1) {
+	if (kTest_Purchase) {
 		rapidjson::Document						cmd; cmd.SetObject();
 		rapidjson::Document::AllocatorType&		allocator = cmd.GetAllocator();
 
@@ -204,8 +213,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		cmd.AddMember(kPaddleCmdKey_COUPON,		"fake-coupon",		allocator);
 		cmd.AddMember(kPaddleCmdKey_COUNTRY,	"US",				allocator);
 		cmd.AddMember(kPaddleCmdKey_POSTCODE,	"94602",			allocator);
-		cmd.AddMember(kPaddleCmdKey_TITLE,		"Catnip",			allocator);
-		cmd.AddMember(kPaddleCmdKey_MESSAGE,	"For fluffy cats",	allocator);
+
+		//	un comment these to override what's shown
+		// cmd.AddMember(kPaddleCmdKey_TITLE,		"Catnip",			allocator);
+		// cmd.AddMember(kPaddleCmdKey_MESSAGE,	"For fluffy cats",	allocator);
 
 		std::string		resultStr = paddle.Purchase(JSON_ConvertToString(cmd));
 
