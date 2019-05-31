@@ -1,4 +1,6 @@
-﻿using System;
+﻿// #define	kUseEventLoop
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -45,7 +47,7 @@ namespace PaddleWrapper
         private bool                i_openInBrowser;
         private bool                i_isDialog;
 
-        private TaskCompletionSource<string> currentTaskCompletionSource;
+        private TaskCompletionSource<string> i_currentTaskCompletionSource;
 
 		private Thread                  thread;
 		private SynchronizationContext  ctx;
@@ -222,10 +224,16 @@ namespace PaddleWrapper
             return jsonResult;
 		}
 
+
+		#if (kUseEventLoop)
 		static string s_asyncStr;
+		#endif
+
         private string ValidateAsync(PaddleProduct product)
         {
-           // var t = new TaskCompletionSource<string>();
+			#if !(kUseEventLoop)
+				var t = new TaskCompletionSource<string>();
+			#endif
 
             product.VerifyActivation((VerificationState state, string s) =>
             {
@@ -237,19 +245,23 @@ namespace PaddleWrapper
                     { kPaddleCmdKey_ERRORS_ARRAY, stringArr }
                 };
 
-				//t.TrySetResult(jsonObject.ToString());
-
-				s_asyncStr = jsonObject.ToString();
+				#if !(kUseEventLoop)
+					t.TrySetResult(jsonObject.ToString());
+				#else
+					s_asyncStr = jsonObject.ToString();
+				#endif
             });
 
-			while (string.IsNullOrEmpty(s_asyncStr))
-			{
-				Application.DoEvents();
-			}
+			#if (kUseEventLoop)
+				while (string.IsNullOrEmpty(s_asyncStr))
+				{
+					Application.DoEvents();
+				}
 
-			return s_asyncStr;
-
-//            return t.Task.Result;
+				return s_asyncStr;
+			#else
+	            return t.Task.Result;
+			#endif
         }
 
 		public string					Activate(string jsonCmd)
@@ -279,7 +291,8 @@ namespace PaddleWrapper
                 PostCode	= postStr
             };
 
-			//	custom param keys are documented here: https://paddle.com/docs/api-custom-checkout/
+			//	custom param keys are documented here: 
+			//	https://paddle.com/docs/api-custom-checkout/
 			checkoutOptions.AddCheckoutParameters("quantity_variable",	"0");
 			checkoutOptions.AddCheckoutParameters("title",				titleStr);
 			checkoutOptions.AddCheckoutParameters("custom_message",		messageStr);
@@ -304,24 +317,47 @@ namespace PaddleWrapper
 			return jsonResult;
 		}
 
+		#if	(kUseEventLoop)
+		static string	s_checkoutResultStr;
+		#endif
+
         public	string		ShowCheckoutWindowAsync(
 			PaddleProductID productID, 
 			CheckoutOptions options,// = null, 
 			bool showInBrowser,// = false, 
 			bool isDialog)// = true)
+
+		#if (kUseEventLoop)
         {
+			PaddleProduct	product = Paddle_GetProduct(productID);
+
+            product.Refresh((success) => {
+                Paddle.Instance.ShowCheckoutWindowForProduct(product, options, showInBrowser, isDialog);
+            });
+			
+			while (string.IsNullOrEmpty(s_checkoutResultStr))
+			{
+				Application.DoEvents();
+			}
+
+			return s_checkoutResultStr;
+		}
+
+		#else
+		{
             i_checkoutOptions	= options;
             i_openInBrowser		= showInBrowser;
             i_isDialog			= isDialog;
 
-            currentTaskCompletionSource = new TaskCompletionSource<string>();
+            i_currentTaskCompletionSource = new TaskCompletionSource<string>();
 
             ShowPaddleWindow(productID, (int) PaddleWindowType.Checkout);
 
-			string resultStr = currentTaskCompletionSource.Task.Result;
+			string resultStr = i_currentTaskCompletionSource.Task.Result;
            
 			return resultStr;
         }
+		#endif
 
         // TODO Make this private and wrap other windows as above
 		public void ShowPaddleWindow(PaddleProductID productID, int windowType)
@@ -447,11 +483,14 @@ namespace PaddleWrapper
 
 			Debug.WriteLine("Paddle_TransactionBeginEvent");
 			Debug.WriteLine(e.ToString());
+
+			#if (kUseEventLoop)
+				s_checkoutResultStr = e.ToString();
+			#endif
 		}
 
 		private void Paddle_TransactionCompleteEvent(object sender, TransactionCompleteEventArgs e)
 		{
-
 			string processStatusJson = JsonConvert.SerializeObject(e.ProcessStatus, Formatting.Indented);
 
 			if (transactionCompleteCallback != null) transactionCompleteCallback.Invoke(
@@ -466,7 +505,11 @@ namespace PaddleWrapper
 			Debug.WriteLine("Paddle_TransactionCompleteEvent");
 			Debug.WriteLine(e.ToString());
 
-            currentTaskCompletionSource.TrySetResult(processStatusJson);
+			#if (kUseEventLoop)
+				s_checkoutResultStr = errorObject.ToString();
+			#else
+	            i_currentTaskCompletionSource.TrySetResult(e.ToString());
+			#endif
 		}
 
 		private void Paddle_TransactionErrorEvent(object sender, TransactionErrorEventArgs e)
@@ -483,23 +526,35 @@ namespace PaddleWrapper
                 { kPaddleCmdKey_ERRORS_ARRAY }
             };
 
-            currentTaskCompletionSource.TrySetResult(errorObject.ToString());
+			#if (kUseEventLoop)
+				s_checkoutResultStr = errorObject.ToString();
+			#else
+	            i_currentTaskCompletionSource.TrySetResult(errorObject.ToString());
+			#endif
 		}
 
 		private void Paddle_LicensingBeginEvent(object sender, LicensingStartingEventArgs e)
 		{
 			// TODO
+			#if (kUseEventLoop)
+			s_checkoutResultStr = "{\"" + kPaddleCmdKey_SUCCESS  + "\":false}";
+			#endif
 		}
 
 		private void Paddle_LicensingCompleteEvent(object sender, LicensingCompleteEventArgs e)
 		{
 			// TODO
+			#if (kUseEventLoop)
+			s_checkoutResultStr = "{\"" + kPaddleCmdKey_SUCCESS  + "\":false}";
+			#endif
 		}
 
 		private void Paddle_LicensingErrorEvent(object sender, LicensingErrorEventArgs e)
 		{
 			// TODO
-		}
-	
+			#if (kUseEventLoop)
+			s_checkoutResultStr = "{\"" + kPaddleCmdKey_SUCCESS  + "\":false}";
+			#endif
+		}	
 	}
 }
