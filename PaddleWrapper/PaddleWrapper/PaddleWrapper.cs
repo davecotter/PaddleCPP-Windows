@@ -231,26 +231,31 @@ namespace PaddleWrapper
 
         private string ValidateAsync(PaddleProduct product)
         {
+			string		resultStr = "";
+			
 			#if !(kUseEventLoop)
 				var t = new TaskCompletionSource<string>();
 			#endif
 
-            product.VerifyActivation((VerificationState state, string s) =>
-            {
-                var stringArr = new JArray { s };
+			product.Refresh((success) =>
+			{
+				product.VerifyActivation((VerificationState state, string s) =>
+				{
+					var stringArr = new JArray { s };
 
-                JObject jsonObject = new JObject
-                {
-                    { kPaddleCmdKey_RETURNVAL, Convert.ToInt32(state) },
-                    { kPaddleCmdKey_ERRORS_ARRAY, stringArr }
-                };
+					JObject jsonObject = new JObject
+					{
+						{ kPaddleCmdKey_RETURNVAL, Convert.ToInt32(state) },
+						{ kPaddleCmdKey_ERRORS_ARRAY, stringArr }
+					};
 
-				#if !(kUseEventLoop)
-					t.TrySetResult(jsonObject.ToString());
-				#else
-					s_asyncStr = jsonObject.ToString();
-				#endif
-            });
+					#if !(kUseEventLoop)
+						t.TrySetResult(jsonObject.ToString());
+					#else
+						s_asyncStr = jsonObject.ToString();
+					#endif
+				});
+			});
 
 			#if (kUseEventLoop)
 				while (string.IsNullOrEmpty(s_asyncStr))
@@ -258,10 +263,12 @@ namespace PaddleWrapper
 					Application.DoEvents();
 				}
 
-				return s_asyncStr;
+				resultStr = s_asyncStr;
 			#else
-	            return t.Task.Result;
+				resultStr = t.Task.Result;
 			#endif
+
+		return resultStr;
         }
 
 		public string					Activate(string jsonCmd)
