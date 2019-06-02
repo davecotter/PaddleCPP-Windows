@@ -13,8 +13,8 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/prettywriter.h"
 
-#define		kTest_Validate		0
-#define		kTest_Purchase		1
+#define		kTest_Validate		1
+#define		kTest_Purchase		0
 
 #if OPT_2008
 	#define	HAS_INCLUDE		0

@@ -1,4 +1,4 @@
-﻿// #define	kUseEventLoop
+﻿//#define	kUseEventLoop
 
 using System;
 using System.Collections.Generic;
@@ -513,7 +513,7 @@ namespace PaddleWrapper
 			Debug.WriteLine(e.ToString());
 
 			#if (kUseEventLoop)
-				s_checkoutResultStr = errorObject.ToString();
+				s_checkoutResultStr = e.ToString();
 			#else
 	            i_currentTaskCompletionSource.TrySetResult(e.ToString());
 			#endif
