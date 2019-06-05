@@ -212,6 +212,7 @@ namespace PaddleWrapper
 			Paddle.Instance.LicensingErrorEvent			+= Paddle_LicensingErrorEvent;
 		}
 
+		//	validate means verify
 		public string					Validate(string jsonCmd)
 		{
             string				jsonResult	= "";
@@ -219,56 +220,28 @@ namespace PaddleWrapper
             PaddleProductID		prodID		= cmdObject.Value<PaddleProductID>(kPaddleCmdKey_SKU);
             PaddleProduct		product		= Paddle_GetProduct(prodID);
 
-            jsonResult = ValidateAsync(product);
+			jsonResult =  VerifyAsync(product).Result;
 
             return jsonResult;
 		}
 
-
-		#if (kUseEventLoop)
-		static string s_asyncStr;
-		#endif
-
-        private string ValidateAsync(PaddleProduct product)
+        private async Task<string>	VerifyAsync(PaddleProduct product)
         {
-			string		resultStr = "";
-			
-			#if !(kUseEventLoop)
-				var t = new TaskCompletionSource<string>();
-			#endif
+			var tcs = new TaskCompletionSource<string>();
 
-			product.Refresh((success) =>
+			product.VerifyActivation((VerificationState state, string errArrayJsonStr) =>
 			{
-				product.VerifyActivation((VerificationState state, string s) =>
-				{
-					var stringArr = new JArray { s };
+				var errArray = new JArray { errArrayJsonStr };
 
-					JObject jsonObject = new JObject
-					{
-						{ kPaddleCmdKey_RETURNVAL, Convert.ToInt32(state) },
-						{ kPaddleCmdKey_ERRORS_ARRAY, stringArr }
-					};
+				JObject jsonObject = new JObject {
+					{ kPaddleCmdKey_RETURNVAL, Convert.ToInt32(state) },
+					{ kPaddleCmdKey_ERRORS_ARRAY, errArray }
+				};
 
-					#if !(kUseEventLoop)
-						t.TrySetResult(jsonObject.ToString());
-					#else
-						s_asyncStr = jsonObject.ToString();
-					#endif
-				});
+				tcs.TrySetResult(jsonObject.ToString());
 			});
 
-			#if (kUseEventLoop)
-				while (string.IsNullOrEmpty(s_asyncStr))
-				{
-					Application.DoEvents();
-				}
-
-				resultStr = s_asyncStr;
-			#else
-				resultStr = t.Task.Result;
-			#endif
-
-		return resultStr;
+			return await tcs.Task;
         }
 
 		public string					Activate(string jsonCmd)
