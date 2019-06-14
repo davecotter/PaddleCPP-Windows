@@ -653,15 +653,48 @@ namespace PaddleWrapper {
 
 		private string					Deactivate(string jsonCmd)
 		{
-			string		jsonResult = "";
+			string				jsonResult	= "";
+			JObject				cmdObject	= JObject.Parse(jsonCmd);
+			PaddleProductID		prodID		= cmdObject.Value<PaddleProductID>(kPaddleCmdKey_SKU);
+			PaddleProduct		product		= Paddle_GetProduct(prodID);
+			ScTask				task		= new ScTask();
 
+			product.Deactivate( 
+				(bool stateB, string resultStr) =>
+			{
+				CJsonResult			jResult = new CJsonResult {
+					successB	= stateB,
+					resultI		= Convert.ToInt32(stateB),
+					errStr		= resultStr };
+
+				task.set_result(CreateJsonResult(jResult));
+			});
+
+			jsonResult = task.await_result();
 			return jsonResult;
 		}
 
 		private string					RecoverLicense(string jsonCmd)
 		{
-			string		jsonResult = "";
+			string				jsonResult	= "";
+			JObject				cmdObject	= JObject.Parse(jsonCmd);
+			PaddleProductID		prodID		= cmdObject.Value<PaddleProductID>(kPaddleCmdKey_SKU);
+			string				emailStr    = cmdObject.Value<string>(kPaddleCmdKey_EMAIL);
+			PaddleProduct		product		= Paddle_GetProduct(prodID);
+			ScTask				task		= new ScTask();
 
+			product.RecoverActivationWithEmail(emailStr,
+				(bool stateB, string resultStr) =>
+			{
+				CJsonResult			jResult = new CJsonResult {
+					successB	= stateB,
+					resultI		= Convert.ToInt32(stateB),
+					errStr		= resultStr };
+
+				task.set_result(CreateJsonResult(jResult));
+			});
+
+			jsonResult = task.await_result();
 			return jsonResult;
 		}
 
