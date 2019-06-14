@@ -4,25 +4,37 @@
 
 #define DllExport   __declspec(dllexport)
 
+/*
 typedef void(__stdcall *CallbackWithStringType)(const char*);
 typedef void(__stdcall *CallbackType)(void);
 typedef void(__stdcall *CallbackTransactionCompleteType)(const char*, const char*, const char*, const char*, const char*, bool, const char*);
 typedef void(__stdcall *CallbackActivateType)(int, const char*);
-
+	void SetBeginTransactionCallback(CallbackType functionPtr);
+	void SetTransactionCompleteCallback(CallbackTransactionCompleteType functionPtr);
+	void SetTransactionErrorCallback(CallbackWithStringType functionPtr);
+    void SetProductActivateCallback(CallbackActivateType functionPtr);	
+*/
 class PaddleWrapperPrivate;
 
-class DllExport PaddleCLR
-{
-	PaddleWrapperPrivate	*i_wrapperP;
+class DllExport PaddleCLR {
+	PaddleWrapperPrivate		*i_wrapperP;
 
-public:
+	public:
 	typedef int		PaddleProductID;
 
-	enum PaddleWindowType {
-		ProductAccess,
-		Checkout,
-		LicenseActivation
-	};
+	typedef enum {
+		Command_NONE,
+
+		//	must match PaddleWrapper.CommandType
+		//	must match CPaddleCommand.CommandType
+		Command_VALIDATE,
+		Command_ACTIVATE,
+		Command_PURCHASE,
+		Command_DEACTIVATE,
+		Command_RECOVER,
+
+		Command_NUMTYPES
+	} CommandType;
 
 	PaddleCLR(
 		int					vendorID,
@@ -31,28 +43,14 @@ public:
 		const char			*apiKeyStr);
 
 	~PaddleCLR();
+	
+	void			ShowEnterSerialButton();
 
-	void	AddProduct(PaddleProductID prodID, const char *nameStr, const char *localizedTrialStr);
-	void	CreateInstance(PaddleProductID productID);
+	void			AddProduct(PaddleProductID prodID, const char *nameStr, const char *localizedTrialStr);
+	void			CreateInstance(PaddleProductID productID);
 
-	void	debug_print(const char *str);
+	void			debug_print(const char *str);
 
-	std::string			Validate(const std::string& jsonCmd);
-	std::string			Activate(const std::string& jsonCmd);
-	std::string			Purchase(const std::string& jsonCmd);
-	std::string			Deactivate(const std::string& jsonCmd);
-	std::string			RecoverLicense(const std::string& jsonCmd);
-
-	void ShowCheckoutWindow(PaddleProductID productId);
-	void ShowCheckoutWindowSync(PaddleProductID productId);
-	void ShowProductAccessWindow(PaddleProductID productId);
-	void ShowLicenseActivationWindow(PaddleProductID productId);
-
-	void SetBeginTransactionCallback(CallbackType functionPtr);
-	void SetTransactionCompleteCallback(CallbackTransactionCompleteType functionPtr);
-	void SetTransactionErrorCallback(CallbackWithStringType functionPtr);
-    void SetProductActivateCallback(CallbackActivateType functionPtr);	
-
-private:
-    bool transactionComplete;
+	public:
+	std::string		DoCommand(CommandType cmdType, const std::string& jsonCmd);
 };

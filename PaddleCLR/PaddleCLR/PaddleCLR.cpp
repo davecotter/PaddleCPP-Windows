@@ -8,7 +8,7 @@ using namespace System::Runtime::InteropServices;
 
 class PaddleWrapperPrivate {
 	public: 
-	msclr::auto_gcroot<PaddleWrapper::PaddleWrapper^>		paddleRef;
+	msclr::auto_gcroot<PaddleWrapper::CPaddleWrapper^>		paddleRef;
 };
 
 PaddleCLR::PaddleCLR(
@@ -18,7 +18,7 @@ PaddleCLR::PaddleCLR(
 	const char			*apiKeyStr)
 {
 	i_wrapperP = new PaddleWrapperPrivate();
-	i_wrapperP->paddleRef = gcnew PaddleWrapper::PaddleWrapper(
+	i_wrapperP->paddleRef = gcnew PaddleWrapper::CPaddleWrapper(
 		vendorID,
 		gcnew System::String(vendorNameStr),
 		gcnew System::String(vendorAuthStr),
@@ -33,6 +33,11 @@ PaddleCLR::~PaddleCLR()
 void	PaddleCLR::debug_print(const char *str)
 {
 	i_wrapperP->paddleRef->debug_print(gcnew System::String(str));
+}
+
+void	PaddleCLR::ShowEnterSerialButton()
+{
+	i_wrapperP->paddleRef->ShowEnterSerialButton();
 }
 
 void	PaddleCLR::AddProduct(
@@ -61,103 +66,54 @@ static	std::string		StringConvert_SystemToStd_UTF8(System::String^ str)
 	return stdStr;
 }
 
-std::string			PaddleCLR::Validate(const std::string& jsonCmd)
+std::string			PaddleCLR::DoCommand(CommandType in_cmdType, const std::string& jsonCmd)
 {
-	System::String^		returnStr = i_wrapperP->paddleRef->Validate(
+	PaddleWrapper::CommandType		cmdType((PaddleWrapper::CommandType)in_cmdType);
+	System::String^					returnStr = i_wrapperP->paddleRef->DoCommand(
+		cmdType, 
 		gcnew System::String(jsonCmd.c_str()));
 	
 	return StringConvert_SystemToStd_UTF8(returnStr);
 }
 
-std::string			PaddleCLR::Activate(const std::string& jsonCmd)
-{
-	System::String^		returnStr = i_wrapperP->paddleRef->Activate(
-		gcnew System::String(jsonCmd.c_str()));
-	
-	return StringConvert_SystemToStd_UTF8(returnStr);
-}
-
-std::string			PaddleCLR::Purchase(const std::string& jsonCmd)
-{
-	System::String^		returnStr = i_wrapperP->paddleRef->Purchase(
-		gcnew System::String(jsonCmd.c_str()));
-	
-	return StringConvert_SystemToStd_UTF8(returnStr);
-}
-
-std::string			PaddleCLR::Deactivate(const std::string& jsonCmd)
-{
-	System::String^		returnStr = i_wrapperP->paddleRef->Deactivate(
-		gcnew System::String(jsonCmd.c_str()));
-	
-	return StringConvert_SystemToStd_UTF8(returnStr);
-}
-
-std::string			PaddleCLR::RecoverLicense(const std::string& jsonCmd)
-{
-	System::String^		returnStr = i_wrapperP->paddleRef->RecoverLicense(
-		gcnew System::String(jsonCmd.c_str()));
-	
-	return StringConvert_SystemToStd_UTF8(returnStr);
-}
-
-// ----------------------------------------------------------------------------
-void PaddleCLR::ShowCheckoutWindow(PaddleProductID productId)
-{
-	i_wrapperP->paddleRef->ShowPaddleWindow(productId, PaddleCLR::Checkout);
-}
-
-void PaddleCLR::ShowCheckoutWindowSync(PaddleProductID productId)
-{
-	i_wrapperP->paddleRef->ShowPaddleWindow(productId, PaddleCLR::Checkout);
-}
-
-void PaddleCLR::ShowProductAccessWindow(PaddleProductID productId)
-{
-	i_wrapperP->paddleRef->ShowPaddleWindow(productId, PaddleCLR::ProductAccess);
-}
-
-void PaddleCLR::ShowLicenseActivationWindow(PaddleProductID productId)
-{
-	i_wrapperP->paddleRef->ShowPaddleWindow(productId, PaddleCLR::LicenseActivation);
-}
-
+/*
 void PaddleCLR::SetBeginTransactionCallback(CallbackType functionPtr)
 {
-	PaddleWrapper::PaddleWrapper::CallbackDelegate^ callback = 
-		(PaddleWrapper::PaddleWrapper::CallbackDelegate^) Marshal::GetDelegateForFunctionPointer(
+	PaddleWrapper::CPaddleWrapper::CallbackDelegate^ callback =
+		(PaddleWrapper::CPaddleWrapper::CallbackDelegate^) Marshal::GetDelegateForFunctionPointer(
 			System::IntPtr(functionPtr), 
-			PaddleWrapper::PaddleWrapper::CallbackDelegate::typeid);
+			PaddleWrapper::CPaddleWrapper::CallbackDelegate::typeid);
 
 	i_wrapperP->paddleRef->beginTransactionCallback = callback;
 }
 
 void PaddleCLR::SetTransactionCompleteCallback(CallbackTransactionCompleteType functionPtr)
 {
-	PaddleWrapper::PaddleWrapper::CallbackTransactionCompleteDelegate^ callback = 
-		(PaddleWrapper::PaddleWrapper::CallbackTransactionCompleteDelegate^) Marshal::GetDelegateForFunctionPointer(
+	PaddleWrapper::CPaddleWrapper::CallbackTransactionCompleteDelegate^ callback =
+		(PaddleWrapper::CPaddleWrapper::CallbackTransactionCompleteDelegate^) Marshal::GetDelegateForFunctionPointer(
 			System::IntPtr(functionPtr), 
-			PaddleWrapper::PaddleWrapper::CallbackTransactionCompleteDelegate::typeid);
+			PaddleWrapper::CPaddleWrapper::CallbackTransactionCompleteDelegate::typeid);
 
 	i_wrapperP->paddleRef->transactionCompleteCallback = callback;
 }
 
 void PaddleCLR::SetTransactionErrorCallback(CallbackWithStringType functionPtr)
 {
-	PaddleWrapper::PaddleWrapper::CallbackWithStringDelegate^ callback = 
-		(PaddleWrapper::PaddleWrapper::CallbackWithStringDelegate^) Marshal::GetDelegateForFunctionPointer(
+	PaddleWrapper::CPaddleWrapper::CallbackWithStringDelegate^ callback =
+		(PaddleWrapper::CPaddleWrapper::CallbackWithStringDelegate^) Marshal::GetDelegateForFunctionPointer(
 			System::IntPtr(functionPtr),
-			PaddleWrapper::PaddleWrapper::CallbackWithStringDelegate::typeid);
+			PaddleWrapper::CPaddleWrapper::CallbackWithStringDelegate::typeid);
 
 	i_wrapperP->paddleRef->transactionErrorCallback = callback;
 }
 
 void PaddleCLR::SetProductActivateCallback(CallbackActivateType functionPtr)
 {
-	PaddleWrapper::PaddleWrapper::CallbackVerificationDelegate^ callback = 
-		(PaddleWrapper::PaddleWrapper::CallbackVerificationDelegate^) Marshal::GetDelegateForFunctionPointer(
+	PaddleWrapper::CPaddleWrapper::CallbackVerificationDelegate^ callback =
+		(PaddleWrapper::CPaddleWrapper::CallbackVerificationDelegate^) Marshal::GetDelegateForFunctionPointer(
 			System::IntPtr(functionPtr),
-			PaddleWrapper::PaddleWrapper::CallbackVerificationDelegate::typeid);
+			PaddleWrapper::CPaddleWrapper::CallbackVerificationDelegate::typeid);
 
 	i_wrapperP->paddleRef->activateCallback = callback;
 }
+*/

@@ -14,7 +14,7 @@
 #include "rapidjson/prettywriter.h"
 
 #define		kTest_Validate		1
-#define		kTest_Purchase		0
+#define		kTest_Purchase		1
 
 #if OPT_2008
 	#define	HAS_INCLUDE		0
@@ -192,7 +192,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 		cmd.AddMember(kPaddleCmdKey_SKU, PAD_PRODUCT_ID, allocator);
 		
-		std::string		resultStr = paddle.Validate(JSON_ConvertToString(cmd));
+		std::string		resultStr = paddle.DoCommand(
+			PaddleCLR::Command_VALIDATE, 
+			JSON_ConvertToString(cmd));
 
 		OutputDebugStringA("validate response: ");
 		OutputDebugStringA(resultStr.c_str());
@@ -218,7 +220,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		// cmd.AddMember(kPaddleCmdKey_TITLE,		"Catnip",			allocator);
 		// cmd.AddMember(kPaddleCmdKey_MESSAGE,	"For fluffy cats",	allocator);
 
-		std::string		resultStr = paddle.Purchase(JSON_ConvertToString(cmd));
+		std::string		resultStr = paddle.DoCommand(
+			PaddleCLR::Command_PURCHASE,
+			JSON_ConvertToString(cmd));
 
 		OutputDebugStringA("Purchase response:");
 		OutputDebugStringA(resultStr.c_str());
