@@ -12,13 +12,13 @@ just open the sln and run it, it should "just work"
 it should automatically download all the proper NuGet packages
 
 open "Form1.cs" and set these variables:
-PAD_VENDOR_ID	
-PAD_VENDOR_NAME	
-PAD_VENDOR_AUTH	
-PAD_API_KEY		
-
-PAD_PRODUCT_ID	
-PAD_PRODUCT_NAME
+PAD_VENDOR_ID\n	
+PAD_VENDOR_NAME\n
+PAD_VENDOR_AUTH	\n
+PAD_API_KEY\n
+\n
+PAD_PRODUCT_ID\n
+PAD_PRODUCT_NAME\n
 
 then run. then you can test your own products, test purchasing with coupons, test the validation call.
 
@@ -56,4 +56,9 @@ Add `PaddleCLR\PaddleCLR` to "Additional header search paths" (In C/C++ section)
 Add `PaddleCLR\Debug` or `PaddleCLR\Release` to "Additional library paths" (In Linker/General section)
 
 Add `PaddleCLR.lib` to "Additional dependencies" (Linker/Input section)
+
+you'll also have to copy these assemblies next to your exe:
+PaddleSDK StructureMap Newtonsoft.Json Interop.SHDocVw CredentialManagement System.Threading
+
+see PaddleExample/post_build.bat for an example post build script
 
