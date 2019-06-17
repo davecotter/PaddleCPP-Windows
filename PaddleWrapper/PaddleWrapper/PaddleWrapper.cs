@@ -423,6 +423,8 @@ namespace PaddleWrapper {
 				productStr, 
 				Paddle_GetConfig(productID));
 
+			Paddle.Instance.HighDpiMode = true;
+
 			Paddle.Instance.TransactionBeginEvent		+= Paddle_CheckoutBeginEvent;
 			Paddle.Instance.TransactionCompleteEvent	+= Paddle_CheckoutCompleteEvent;
 			Paddle.Instance.TransactionErrorEvent		+= Paddle_CheckoutErrorEvent;
