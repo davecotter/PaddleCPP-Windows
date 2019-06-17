@@ -1,18 +1,38 @@
 # Paddle Wrapper
 
-
-
 ## Setup
-(Tested with VS2017)
-
+(Tested with VS2017, VS2008)
 
 
 ### Build instructions
+Using vs2017 or later:
+first try the C# project: "PaddleExampleCS"
 
-You may need to open the PaddleWrapper project, and make sure that the PaddleSDK has installed correctly from NuGet. 
-Make sure this project builds on its own. 
+just open the sln and run it, it should "just work"
+it should automatically download all the proper NuGet packages
 
-You should then be able to open, build and run PaddleExample. 
+open "Form1.cs" and set these variables:
+PAD_VENDOR_ID	
+PAD_VENDOR_NAME	
+PAD_VENDOR_AUTH	
+PAD_API_KEY		
+
+PAD_PRODUCT_ID	
+PAD_PRODUCT_NAME
+
+then run. then you can test your own products, test purchasing with coupons, test the validation call.
+
+-----------------------
+next try the C++ project: "PaddleExample"
+open the solution and run it, should "just work" as before
+note it sometimes fails to build, but if you do a full "rebuild" that always works. don't know why
+
+now open the file "PaddleExample.cpp"
+and set the variables named above
+
+scroll down to "Relevant Example Code starts here"
+
+note we use RapidJSON for packaging up parameters to send to Paddle, and to get data back.
 
 ### Adding to your project
 
@@ -36,59 +56,4 @@ Add `PaddleCLR\PaddleCLR` to "Additional header search paths" (In C/C++ section)
 Add `PaddleCLR\Debug` or `PaddleCLR\Release` to "Additional library paths" (In Linker/General section)
 
 Add `PaddleCLR.lib` to "Additional dependencies" (Linker/Input section)
-
-### Example code
-
-Callback functions:
-
-```cpp
-void __stdcall beginTransactionCallback()
-{
-	OutputDebugStringA("beginTransactionCallback\n");
-}
-
-void __stdcall transactionCompleteCallback(const char* productID,
-                                           const char* userEmail,
-					   const char* userCountry,
-					   const char* licenseCode,
-					   const char* orderID,
-					   bool flagged,
-					   const char* processStatusJson)
-{
-	OutputDebugStringA("transactionCompleteCallback:\n");
-	OutputDebugStringA(productID);
-	OutputDebugStringA("\n");
-	OutputDebugStringA(userEmail);
-	OutputDebugStringA("\n");
-	OutputDebugStringA(userCountry);
-	OutputDebugStringA("\n");
-	OutputDebugStringA(licenseCode);
-	OutputDebugStringA("\n");
-	OutputDebugStringA(orderID);
-	OutputDebugStringA("\n");
-	OutputDebugStringA(flagged ? "flagged == true" : "flagged == false");
-	OutputDebugStringA("\n");
-	OutputDebugStringA(processStatusJson);
-}
-
-void __stdcall transactionErrorCallback(const char* error)
-{
-	OutputDebugStringA("transactionErrorCallback\n");
-	OutputDebugStringA(error);
-}
-```
-
-Calling code:
-
-```cpp
-auto paddle = PaddleCLR::PaddleCLR(PAD_VENDOR_ID, PAD_PRODUCT, PAD_API_KEY, PAD_PRODUCT_NAME, PAD_VENDOR_NAME);
-
-paddle.SetBeginTransactionCallback(beginTransactionCallback);
-paddle.SetTransactionCompleteCallback(transactionCompleteCallback);
-paddle.SetTransactionErrorCallback(transactionErrorCallback);
-paddle.ShowCheckoutWindow(PAD_PRODUCT);
-
-```
-
-Where all capitalized words are `#define`s with your Paddle vendor and product details. 
 
