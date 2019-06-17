@@ -149,27 +149,9 @@ namespace PaddleWrapper {
 		public delegate bool ShowProductWindowDelegate(PaddleProduct product, ProductWindowConfig config, bool isDialog);
 		#endif
 
-		// Delegates used for native C++ callback functions
-		public delegate void CallbackDelegate();
-		public delegate void CallbackWithStringDelegate(string s);
-		public delegate void CallbackTransactionCompleteDelegate(
-			string productIDStr, 
-			string userEmailStr, 
-			string userCountryStr, 
-			string licenseCodeStr,
-			string orderID,
-			bool   flaggedB,
-			string processStatusStr);
-
-		public delegate void CallbackVerificationDelegate(int verificationState, string verificationString);
-
-		public CallbackDelegate	                    beginTransactionCallback;
-		public CallbackTransactionCompleteDelegate  transactionCompleteCallback;
-		public CallbackWithStringDelegate           transactionErrorCallback;
-		public CallbackVerificationDelegate         activateCallback;
-		public CallbackVerificationDelegate         validateCallback;
-
 		// ----------------------------------------------------------------------
+		//	since ActivationState doesn't exist in PaddleSDK v 2.0.10, we
+		//	implement it here so we have a consistent cross platform API
 		private ActivationState		ConvertState_VerifyToActivate(
 			PaddleSDK.Product.VerificationState verifyState)
 		{
@@ -207,6 +189,7 @@ namespace PaddleWrapper {
 			public string	responseJson		= "";
 		};
 		
+		//	match the error style returned in the mac version
 		private string			CreateJsonResult(CJsonResult jsonClass)
 		{
 			JObject		errArrayDict = new JObject { };	//	empty dict
@@ -244,7 +227,17 @@ namespace PaddleWrapper {
 		private delegate void	SafeCallDelegate_ButtonHide(Control buttonRef);
 		private delegate void	SafeCallDelegate_WindowClosed();
 		private int[]			i_checkoutWindID;
-
+		
+		/*
+			the first one listens for "window opened" events
+			this catches when the checkout window opens.
+			
+			that way we can do 2 things:
+			1: catch it when it closes (letting the caller know the window closed) and
+			2: hide the "enter serial number" button because their UI for it isn't that great
+				and we want to support silent activation anyway (by gathering the info first
+				with our own UI)
+		*/
 		private void	RegisterEventListeners()
 		{
 			Automation.AddAutomationEventHandler(
@@ -833,42 +826,53 @@ namespace PaddleWrapper {
 
 		private void Paddle_CheckoutErrorEvent(object sender, TransactionErrorEventArgs e)
 		{
-			debug_print(e.ToString());
-
-			CJsonResult			jResult = new CJsonResult {
-				resultI		= Convert.ToInt32(CheckoutState.Failed),
-				// ?? errCodeI	= PADErrorLicenseActivationFailed,
-				errStr		= e.Error };
-
-			ScTask.get().set_result(CreateJsonResult(jResult));
-		}
-
-		private void Paddle_CheckoutWindowClosed()
-		{
-			//	task may be NULL at this point 
-			//	if the checkout completed or errored
 			ScTask		task = ScTask.get();
+
+			debug_print(e.ToString());
 			
+			//	task may be NULL at this point 
+			//	if the checkout already completed
 			if (task != null) {
-				CJsonResult		jResult = new CJsonResult {
-					resultI		= Convert.ToInt32(CheckoutState.Abandoned) };
-					
+				CJsonResult			jResult = new CJsonResult {
+					resultI		= Convert.ToInt32(CheckoutState.Failed),
+					// ?? errCodeI	= PADErrorLicenseActivationFailed,
+					errStr		= e.Error };
+
 				task.set_result(CreateJsonResult(jResult));
 			}
 		}
 
 		private void Paddle_CheckoutCompleteEvent(object sender, TransactionCompleteEventArgs e)
 		{
-			string		purchResponseJsonStr = JsonConvert.SerializeObject(e.ProcessStatus, Formatting.Indented);
+			ScTask		task = ScTask.get();
 
 			debug_print(e.ToString());
 			
-			CJsonResult			jResult = new CJsonResult {
-				successB		= true,
-				resultI			= Convert.ToInt32(CheckoutState.Purchased),
-				responseJson	= purchResponseJsonStr };
+			Debug.Assert(task != null, "ScTask should not be NULL");
+			if (task != null) {
+				string		purchResponseJsonStr = JsonConvert.SerializeObject(e.ProcessStatus, Formatting.Indented);
+				
+				CJsonResult			jResult = new CJsonResult {
+					successB		= true,
+					resultI			= Convert.ToInt32(CheckoutState.Purchased),
+					responseJson	= purchResponseJsonStr };
 
-			ScTask.get().set_result(CreateJsonResult(jResult));
+				task.set_result(CreateJsonResult(jResult));
+			}
+		}
+
+		private void Paddle_CheckoutWindowClosed()
+		{
+			ScTask		task = ScTask.get();
+			
+			//	task may be NULL at this point 
+			//	if the checkout already completed or errored
+			if (task != null) {
+				CJsonResult		jResult = new CJsonResult {
+					resultI		= Convert.ToInt32(CheckoutState.Abandoned) };
+					
+				task.set_result(CreateJsonResult(jResult));
+			}
 		}
 
 		// ----------------------------------------------------------------------------------
@@ -882,25 +886,35 @@ namespace PaddleWrapper {
 
 		private void Paddle_LicensingErrorEvent(object sender, LicensingErrorEventArgs e)
 		{
+			ScTask		task = ScTask.get();
+
 			debug_print(e.ToString());
+			
+			//	may be NULL during auto-activate
+			if (task != null) {
+				CJsonResult			jResult = new CJsonResult {
+					resultI			= Convert.ToInt32(ActivationState.Failed),
+					errCodeI		= PADErrorLicenseActivationFailed,
+					errStr			= "Licensing failed" };
 
-			CJsonResult			jResult = new CJsonResult {
-				resultI			= Convert.ToInt32(ActivationState.Failed),
-				errCodeI		= PADErrorLicenseActivationFailed,
-				errStr			= "Licensing failed" };
-
-			ScTask.get().set_result(CreateJsonResult(jResult));
+				task.set_result(CreateJsonResult(jResult));
+			}
 		}	
 
 		private void Paddle_LicensingCompleteEvent(object sender, LicensingCompleteEventArgs e)
 		{
+			ScTask		task = ScTask.get();
+			
 			debug_print(e.ToString());
 
-			CJsonResult			jResult = new CJsonResult {
-				successB		= true,
-				resultI			= Convert.ToInt32(ActivationState.Activated) };
+			//	may be NULL during auto-activate
+			if (task != null) {
+				CJsonResult			jResult = new CJsonResult {
+					successB		= true,
+					resultI			= Convert.ToInt32(ActivationState.Activated) };
 
-			ScTask.get().set_result(CreateJsonResult(jResult));
+				task.set_result(CreateJsonResult(jResult));
+			}
 		}
 
 		// ----------------------------------------------------------------------------------
@@ -908,11 +922,7 @@ namespace PaddleWrapper {
 		{
 			debug_print(e.ToString());
 			
-			// PADErrorUnableToRecoverLicense = -114,
-			
 			CJsonResult			jResult = new CJsonResult {
-				successB		= false,
-				resultI			= 0,
 				errCodeI		= PADErrorUnableToRecoverLicense,
 				errStr			= e.Message };
 
