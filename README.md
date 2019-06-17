@@ -5,29 +5,29 @@
 
 
 ### Build instructions
-Using vs2017 or later:
+Using vs2017 or later:<br>
 first try the C# project: "PaddleExampleCS"
 
-just open the sln and run it, it should "just work"
+just open the sln and run it, it should "just work"<br>
 it should automatically download all the proper NuGet packages
 
-open "Form1.cs" and set these variables:
-PAD_VENDOR_ID\n	
-PAD_VENDOR_NAME\n
-PAD_VENDOR_AUTH	\n
-PAD_API_KEY\n
-\n
-PAD_PRODUCT_ID\n
-PAD_PRODUCT_NAME\n
+open "Form1.cs" and set these variables:<br>
+PAD_VENDOR_ID<br>
+PAD_VENDOR_NAME<br>
+PAD_VENDOR_AUTH<br>
+PAD_API_KEY<br>
+<br>
+PAD_PRODUCT_ID<br>
+PAD_PRODUCT_NAME<br>
 
 then run. then you can test your own products, test purchasing with coupons, test the validation call.
 
 -----------------------
-next try the C++ project: "PaddleExample"
-open the solution and run it, should "just work" as before
+next try the C++ project: "PaddleExample"<br>
+open the solution and run it, should "just work" as before<br>
 note it sometimes fails to build, but if you do a full "rebuild" that always works. don't know why
 
-now open the file "PaddleExample.cpp"
+now open the file "PaddleExample.cpp"<br>
 and set the variables named above
 
 scroll down to "Relevant Example Code starts here"
@@ -42,7 +42,7 @@ Either:
 
 Add PaddleWrapper and PaddleCLR to your solution
 
-Add "PaddleCLR.lib" in the Linker/Input section
+Add "PaddleCLR.lib" in the Linker/Input section<br>
 Add the path of PaddleCLR.lib to "Additional Library Directories" in Linker/General
 
 Or: 
@@ -57,7 +57,7 @@ Add `PaddleCLR\Debug` or `PaddleCLR\Release` to "Additional library paths" (In L
 
 Add `PaddleCLR.lib` to "Additional dependencies" (Linker/Input section)
 
-you'll also have to copy these assemblies next to your exe:
+you'll also have to copy these assemblies next to your exe:<br>
 PaddleSDK StructureMap Newtonsoft.Json Interop.SHDocVw CredentialManagement System.Threading
 
 see PaddleExample/post_build.bat for an example post build script
