@@ -135,16 +135,6 @@ static std::string		JSON_ConvertToString(rapidjson::Document& doc)
 	return reinterpret_cast<const char *>(strbuf.GetString());
 }
 
-//	please keep these json key strings (don't change)
-#define		kPaddleCmdKey_SKU				"SKU"
-#define		kPaddleCmdKey_EMAIL				"email"
-#define		kPaddleCmdKey_SERIAL_NUMBER		"serial number"
-#define		kPaddleCmdKey_COUPON			"coupon"
-#define		kPaddleCmdKey_COUNTRY			"country"
-#define		kPaddleCmdKey_POSTCODE			"postcode"
-#define		kPaddleCmdKey_TITLE				"title"		//	product title
-#define		kPaddleCmdKey_MESSAGE			"message"	//	product description
-
 //
 //   FUNCTION: InitInstance(HINSTANCE, int)
 //
@@ -182,6 +172,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		PAD_PRODUCT_ID,
 		PAD_PRODUCT_NAME,
 		"Thanks for trying " PAD_PRODUCT_NAME);
+
+	//	if you want, but you probably don't?
+	// paddle.ShowEnterSerialButton();
 
 	paddle.CreateInstance(PAD_PRODUCT_ID);
 
