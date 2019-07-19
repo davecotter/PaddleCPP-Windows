@@ -698,28 +698,37 @@ namespace PaddleWrapper {
 		public string					DoCommand(CommandType cmdType, string jsonCmd)
 		{
 			string		jsonResult = "";
-						
-			switch (cmdType) {
+
+			try {
+		 
+				switch (cmdType) {
 			
-				case CommandType.Command_VALIDATE: {
-					jsonResult = Validate(jsonCmd);
-				} break;
+					case CommandType.Command_VALIDATE: {
+						jsonResult = Validate(jsonCmd);
+					} break;
 
-				case CommandType.Command_ACTIVATE: {
-					jsonResult = Activate(jsonCmd);
-				} break;
+					case CommandType.Command_ACTIVATE: {
+						jsonResult = Activate(jsonCmd);
+					} break;
 
-				case CommandType.Command_PURCHASE: {
-					jsonResult = Purchase(jsonCmd);
-				} break;
+					case CommandType.Command_PURCHASE: {
+						jsonResult = Purchase(jsonCmd);
+					} break;
 
-				case CommandType.Command_DEACTIVATE: {
-					jsonResult = Deactivate(jsonCmd);
-				} break;
+					case CommandType.Command_DEACTIVATE: {
+						jsonResult = Deactivate(jsonCmd);
+					} break;
 
-				case CommandType.Command_RECOVER: {
-					jsonResult = RecoverLicense(jsonCmd);
-				} break;
+					case CommandType.Command_RECOVER: {
+						jsonResult = RecoverLicense(jsonCmd);
+					} break;
+				}
+			} catch (Exception e) {
+				CJsonResult			jResult = new CJsonResult {
+					successB	= false,
+					errStr		= e.Message };
+
+				jsonResult = CreateJsonResult(jResult);
 			}
 
 			return jsonResult;
