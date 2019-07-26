@@ -18,11 +18,20 @@ PaddleCLR::PaddleCLR(
 	const char			*apiKeyStr)
 {
 	i_wrapperP = new PaddleWrapperPrivate();
+	
+	if (i_wrapperP == NULL) {
+		throw -108;
+	}
+	
 	i_wrapperP->paddleRef = gcnew PaddleWrapper::CPaddleWrapper(
 		vendorID,
 		gcnew System::String(vendorNameStr),
 		gcnew System::String(vendorAuthStr),
 		gcnew System::String(apiKeyStr));
+	
+	if (!i_wrapperP->paddleRef) {
+		throw -109;
+	}
 }
 
 PaddleCLR::~PaddleCLR()
@@ -69,11 +78,20 @@ static	std::string		StringConvert_SystemToStd_UTF8(System::String^ str)
 std::string			PaddleCLR::DoCommand(CommandType in_cmdType, const std::string& jsonCmd)
 {
 	PaddleWrapper::CommandType		cmdType((PaddleWrapper::CommandType)in_cmdType);
-	System::String^					returnStr = i_wrapperP->paddleRef->DoCommand(
-		cmdType, 
-		gcnew System::String(jsonCmd.c_str()));
+	System::String^					cmdStr(gcnew System::String(jsonCmd.c_str()));
+	System::String^					returnStr = i_wrapperP->paddleRef->DoCommand(cmdType, cmdStr);
 	
 	return StringConvert_SystemToStd_UTF8(returnStr);
+}
+
+void				PaddleCLR::Set_debug_print_CB(CallbackWithStringType functionPtr)
+{
+	PaddleWrapper::CPaddleWrapper::CallbackWithStringDelegate^ callback =
+		(PaddleWrapper::CPaddleWrapper::CallbackWithStringDelegate^) Marshal::GetDelegateForFunctionPointer(
+			System::IntPtr(functionPtr),
+			PaddleWrapper::CPaddleWrapper::CallbackWithStringDelegate::typeid);
+
+	i_wrapperP->paddleRef->debug_print_CB = callback;
 }
 
 /*

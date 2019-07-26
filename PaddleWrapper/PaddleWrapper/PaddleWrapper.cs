@@ -322,10 +322,18 @@ namespace PaddleWrapper {
 		public const string kPaddleCmdKey_ERRORS_ARRAY     = "errors array";   //	array of CFError dicts
 		public const string kPaddleCmdKey_TESTING          = "testing";
 
+        public delegate void CallbackWithStringDelegate(string s);
+        public static CallbackWithStringDelegate		debug_print_CB;
+
         public static void		debug_print(string str)
 		{
-			Console.WriteLine(str);
-			Debug.WriteLine(str);
+			if (debug_print_CB != null) {
+				debug_print_CB.Invoke(str);
+				
+			}  else {
+				Console.WriteLine(str);
+				Debug.WriteLine(str);
+			}
 		}
 
 		public class PaddleProductRec

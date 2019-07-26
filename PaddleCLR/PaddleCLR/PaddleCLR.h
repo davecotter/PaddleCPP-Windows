@@ -6,6 +6,8 @@
 
 class PaddleWrapperPrivate;
 
+typedef void (__stdcall *CallbackWithStringType)(const char*);
+
 class DllExport PaddleCLR {
 	PaddleWrapperPrivate		*i_wrapperP;
 
@@ -78,4 +80,6 @@ class DllExport PaddleCLR {
 
 	public:
 	std::string		DoCommand(CommandType cmdType, const std::string& jsonCmd);
+	
+	void			Set_debug_print_CB(CallbackWithStringType functionPtr);
 };
