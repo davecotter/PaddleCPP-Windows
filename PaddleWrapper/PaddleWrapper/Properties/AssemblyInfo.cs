@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Metamuse Media")]
 [assembly: AssemblyProduct("PaddleWrapper")]
-[assembly: AssemblyCopyright("© 2019 Metamuse Media")]
+[assembly: AssemblyCopyright("© 2021 Metamuse Media")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

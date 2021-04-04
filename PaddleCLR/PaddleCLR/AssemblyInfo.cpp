@@ -16,7 +16,7 @@ using namespace System::Security::Permissions;
 [assembly:AssemblyConfigurationAttribute("")];
 [assembly:AssemblyCompanyAttribute("Metamuse Media")];
 [assembly:AssemblyProductAttribute("PaddleCLR")];
-[assembly:AssemblyCopyrightAttribute("(c) 2019 Metamuse Media")];
+[assembly:AssemblyCopyrightAttribute("(c) 2021 Metamuse Media")];
 [assembly:AssemblyTrademarkAttribute("")];
 [assembly:AssemblyCultureAttribute("")];
 
