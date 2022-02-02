@@ -124,6 +124,12 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 }
 
 //---------------------------------------------------------------------------
+static	void			Log(const char *strZ)
+{
+	OutputDebugStringA("Paddle: ");
+	OutputDebugStringA(strZ);
+	OutputDebugStringA("\n");
+}
 
 static std::string		JSON_ConvertToString(rapidjson::Document& doc)
 {
@@ -167,6 +173,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		PAD_VENDOR_AUTH,
 		PAD_API_KEY);
 
+	paddle.Set_debug_print_CB(Log);
+
 	paddle.AddProduct(
 		PAD_PRODUCT_ID,
 		PAD_PRODUCT_NAME,
@@ -176,6 +184,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	// paddle.ShowEnterSerialButton();
 
 	paddle.CreateInstance(PAD_PRODUCT_ID);
+
+	bool		purchaseB(true);
 
 	//	Validate: 
 	if (kTest_Validate) {
@@ -188,8 +198,13 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 			PaddleCLR::Command_VALIDATE, 
 			JSON_ConvertToString(cmd));
 
-		OutputDebugStringA("validate response: ");
-		OutputDebugStringA(resultStr.c_str());
+		Log("validate response: ");
+		Log(resultStr.c_str());
+
+		rapidjson::Document		result;
+		result.Parse(resultStr.c_str());
+
+		purchaseB = !result["success"].GetBool();
 	}
 
 	//	Activate:
@@ -198,7 +213,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	//	kPaddleCmdKey_SERIAL_NUMBER
 
 	//	Purchase:
-	if (kTest_Purchase) {
+	if (purchaseB) {
 		rapidjson::Document						cmd; cmd.SetObject();
 		rapidjson::Document::AllocatorType&		allocator = cmd.GetAllocator();
 
@@ -216,18 +231,28 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 			PaddleCLR::Command_PURCHASE,
 			JSON_ConvertToString(cmd));
 
-		OutputDebugStringA("Purchase response:");
-		OutputDebugStringA(resultStr.c_str());
-	}
+		Log("Checkout response:");
+		Log(resultStr.c_str());
+		Log("Checkout complete");
+	} else {
+		rapidjson::Document						cmd; cmd.SetObject();
+		rapidjson::Document::AllocatorType&		allocator = cmd.GetAllocator();
 
-	//	Deactivate:
-	//	kPaddleCmdKey_SKU
+		cmd.AddMember(kPaddleCmdKey_SKU, PAD_PRODUCT_ID, allocator);
+
+		std::string		resultStr = paddle.DoCommand(
+			PaddleCLR::Command_DEACTIVATE,
+			JSON_ConvertToString(cmd));
+
+		Log("deactivate response:");
+		Log(resultStr.c_str());
+		Log("deactivate complete");
+	}
 
 	//	RecoverLicense:
 	//	kPaddleCmdKey_SKU
 	//	kPaddleCmdKey_EMAIL
 
-	OutputDebugStringA("Checkout complete\n");
 	return TRUE;
 }
 

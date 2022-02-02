@@ -6,7 +6,7 @@
 
 class PaddleWrapperPrivate;
 
-typedef void (__stdcall *CallbackWithStringType)(const char*);
+typedef void (__cdecl *CallbackWithStringType)(const char*);
 
 class DllExport PaddleCLR {
 	PaddleWrapperPrivate		*i_wrapperP;

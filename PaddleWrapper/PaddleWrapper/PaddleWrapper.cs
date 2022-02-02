@@ -363,7 +363,7 @@ namespace PaddleWrapper {
 
 		PaddleProductMap		i_prodMap = new PaddleProductMap();
 
-		public void AddProduct(PaddleProductID prodID, string nameStr, string localizedTrialStr)
+		public void						AddProduct(PaddleProductID prodID, string nameStr, string localizedTrialStr)
 		{
 			i_prodMap[prodID] = new PaddleProductRec(nameStr, localizedTrialStr);
 		}
@@ -494,6 +494,8 @@ namespace PaddleWrapper {
 		//	validate means verify
 		private string					Validate(string jsonCmd)
 		{
+            debug_print("Validate");
+
 			string				jsonResult;
             JObject				cmdObject	= JObject.Parse(jsonCmd);
             PaddleProductID		prodID		= cmdObject.Value<PaddleProductID>(kPaddleCmdKey_SKU);
@@ -596,6 +598,8 @@ namespace PaddleWrapper {
 		//-------------------------------------------------------------------
 		private string					Activate(string jsonCmd)
 		{
+            debug_print("Activate");
+
 			string				jsonResult	= "";
 			JObject				cmdObject	= JObject.Parse(jsonCmd);
 			PaddleProductID		prodID		= cmdObject.Value<PaddleProductID>(kPaddleCmdKey_SKU);
@@ -624,6 +628,8 @@ namespace PaddleWrapper {
 
 		private string					Purchase(string jsonCmd)
 		{
+            debug_print("Purchase");
+
 			string							jsonResult	= "";
             JObject							cmdObject	= JObject.Parse(jsonCmd);
             PaddleProductID					prodID		= cmdObject.Value<PaddleProductID>(kPaddleCmdKey_SKU);
@@ -656,6 +662,8 @@ namespace PaddleWrapper {
 
 		private string					Deactivate(string jsonCmd)
 		{
+            debug_print("Deactivate");
+
 			string				jsonResult	= "";
 			JObject				cmdObject	= JObject.Parse(jsonCmd);
 			PaddleProductID		prodID		= cmdObject.Value<PaddleProductID>(kPaddleCmdKey_SKU);
@@ -679,6 +687,8 @@ namespace PaddleWrapper {
 
 		private string					RecoverLicense(string jsonCmd)
 		{
+            debug_print("RecoverLicense");
+
 			string				jsonResult	= "";
 			JObject				cmdObject	= JObject.Parse(jsonCmd);
 			PaddleProductID		prodID		= cmdObject.Value<PaddleProductID>(kPaddleCmdKey_SKU);
@@ -706,6 +716,8 @@ namespace PaddleWrapper {
 		public string					DoCommand(CommandType cmdType, string jsonCmd)
 		{
 			string		jsonResult = "";
+
+            debug_print("DoCommand");
 
 			try {
 		 
@@ -752,6 +764,8 @@ namespace PaddleWrapper {
 			ScTask			task	= new ScTask();
 			PaddleProduct	product	= Paddle_GetProduct(productID);
 
+            debug_print("ShowCheckoutWindowAsync");
+
 			product.Refresh((success) => {
 				#if kUseThreads
 					//	do on another thread
@@ -775,7 +789,9 @@ namespace PaddleWrapper {
 		// https://stackoverflow.com/questions/21680738/how-to-post-messages-to-an-sta-thread-running-a-message-pump/21684059#21684059
 		private void InitializeWindowThread(object sender, EventArgs e)
 		{
-			i_sync_context = SynchronizationContext.Current;
+            debug_print("InitializeWindowThread");
+            
+            i_sync_context = SynchronizationContext.Current;
 			
 			i_threadInitEvent.Set();
 			
@@ -788,7 +804,8 @@ namespace PaddleWrapper {
 			switch (i_threadData.i_currentWindowType) {
 
 				case PaddleWindowType.Checkout:
-					ShowCheckoutWindowDelegate		showCheckoutWindowDelegate = Paddle.Instance.ShowCheckoutWindowForProduct;
+                    debug_print("PaddleWindowType.Checkout");
+                    ShowCheckoutWindowDelegate showCheckoutWindowDelegate = Paddle.Instance.ShowCheckoutWindowForProduct;
 					
                     i_sync_context.Send((_) => showCheckoutWindowDelegate.Invoke(
 						i_threadData.i_currentProduct, 
@@ -798,7 +815,8 @@ namespace PaddleWrapper {
                     break;
 				
 				case PaddleWindowType.LicenseActivation:
-					ShowLicenseWindowDelegate       showLicenseWindowDelegate = Paddle.Instance.ShowLicenseActivationWindowForProduct;
+                    debug_print("PaddleWindowType.LicenseActivation");
+                    ShowLicenseWindowDelegate showLicenseWindowDelegate = Paddle.Instance.ShowLicenseActivationWindowForProduct;
                     
 					i_threadData.i_licenseWindowConfig = new LicenseWindowConfig();
 
@@ -809,7 +827,8 @@ namespace PaddleWrapper {
 					break;
 
 				case PaddleWindowType.ProductAccess:
-					ShowProductWindowDelegate       showProductWindowDelegate = Paddle.Instance.ShowProductAccessWindowForProduct;
+                    debug_print("PaddleWindowType.ProductAccess");
+                    ShowProductWindowDelegate showProductWindowDelegate = Paddle.Instance.ShowProductAccessWindowForProduct;
 
 					i_threadData.i_productWindowConfig = new ProductWindowConfig();
 
@@ -823,7 +842,9 @@ namespace PaddleWrapper {
 
 		private void StartWindowThread()
 		{
-			using (i_threadInitEvent = new ManualResetEvent(false))
+            debug_print("StartWindowThread");
+            
+            using (i_threadInitEvent = new ManualResetEvent(false))
 			{
 				i_window_threadRef = new Thread(() => {
 					Application.Idle += InitializeWindowThread;
@@ -840,14 +861,16 @@ namespace PaddleWrapper {
 		//-------------------------------------------------------------------
 		private void Paddle_CheckoutBeginEvent(object sender, TransactionBeginEventArgs e)
 		{
-			debug_print(e.ToString());
+            debug_print("CheckoutBeginEvent");
+            debug_print(e.ToString());
 		}
 
 		private void Paddle_CheckoutErrorEvent(object sender, TransactionErrorEventArgs e)
 		{
 			ScTask		task = ScTask.get();
 
-			debug_print(e.ToString());
+            debug_print("CheckoutErrorEvent");
+            debug_print(e.ToString());
 			
 			//	task may be NULL at this point 
 			//	if the checkout already completed
@@ -865,6 +888,7 @@ namespace PaddleWrapper {
 		{
 			ScTask		task = ScTask.get();
 
+            debug_print("CheckoutCompleteEvent");
 			debug_print(e.ToString());
 			
 			Debug.Assert(task != null, "ScTask should not be NULL");
@@ -883,8 +907,10 @@ namespace PaddleWrapper {
 		private void Paddle_CheckoutWindowClosed()
 		{
 			ScTask		task = ScTask.get();
-			
-			//	task may be NULL at this point 
+
+            debug_print("CheckoutWindowClosed");
+            
+            //	task may be NULL at this point 
 			//	if the checkout already completed or errored
 			if (task != null) {
 				CJsonResult		jResult = new CJsonResult {
@@ -897,6 +923,7 @@ namespace PaddleWrapper {
 		// ----------------------------------------------------------------------------------
 		private void Paddle_LicensingBeginEvent(object sender, LicensingStartingEventArgs e)
 		{
+            debug_print("LicensingBeginEvent");
 			debug_print(e.ToString());
 			
 			e.AutoActivate = true;
@@ -907,6 +934,7 @@ namespace PaddleWrapper {
 		{
 			ScTask		task = ScTask.get();
 
+            debug_print("LicensingErrorEvent");
 			debug_print(e.ToString());
 			
 			//	may be NULL during auto-activate
@@ -924,6 +952,7 @@ namespace PaddleWrapper {
 		{
 			ScTask		task = ScTask.get();
 			
+            debug_print("LicensingCompleteEvent");
 			debug_print(e.ToString());
 
 			//	may be NULL during auto-activate
@@ -939,6 +968,7 @@ namespace PaddleWrapper {
 		// ----------------------------------------------------------------------------------
 		private void Paddle_RecoveryErrorEvent(object sender, LicensingRecoveryErrorEventArgs e)
 		{
+            debug_print("RecoveryErrorEvent");
 			debug_print(e.ToString());
 			
 			CJsonResult			jResult = new CJsonResult {
@@ -950,6 +980,7 @@ namespace PaddleWrapper {
 
 		private void Paddle_RecoveryCompleteEvent(object sender, LicensingRecoveryCompleteEventArgs e)
 		{
+            debug_print("RecoveryCompleteEvent");
 			debug_print(e.ToString());
 			debug_print(e.Message);
 

@@ -117,7 +117,7 @@
       <AdditionalUsingDirectories>$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration);%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration)\</AdditionalLibraryDirectories>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
@@ -144,7 +144,7 @@
       <AdditionalUsingDirectories>$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration);%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\PaddleWrapper\PaddleWrapper\bin\$(PlatformTarget)\$(Configuration)\</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
   </ItemDefinitionGroup>
